@@ -44,6 +44,17 @@ body::before{content:"";position:fixed;inset:0;opacity:.06;pointer-events:none;b
 .mod{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:10px;z-index:5}
 .mod>div{background:var(--bg);border:2px solid #fff;border-radius:10px;padding:12px;max-width:520px;width:100%;max-height:92vh;overflow:auto}
 #toast{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#000c;border:2px solid #fff;border-radius:8px;padding:7px 12px;display:none;z-index:9}
+.card{border-radius:5px;box-shadow:0 3px 0 #0006;background:#555}
+.card .n{display:block;background:#555;text-align:center;padding:3px 3px 2px}.card .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 0 #000}
+.stars{white-space:nowrap;line-height:1}.card .n .st{font-size:15px;overflow:visible;text-shadow:0 1px 0 #000}
+.pic{background-image:repeating-linear-gradient(135deg,#fff3 0 7px,#0000 7px 14px);aspect-ratio:5/3}
+.pic u{position:absolute;left:5px;bottom:3px;font-size:10px;text-decoration:none;z-index:1;text-shadow:0 1px 0 #000}
+.bar.g{background:#8a8a8a;border-radius:0}.bar.g>i{background:#1ff01f}
+.pgl{display:inline-flex;align-items:center;gap:4px}.dot{width:8px;height:8px;border-radius:50%;background:#fff5;display:inline-block}.dot.on{background:var(--acc)}
+.kick{display:flex;gap:10px;align-items:stretch}.kp{flex:1;display:flex;gap:10px;border:2px solid #fff;border-radius:7px;padding:8px}.kc{width:130px;flex:none}
+@media(orientation:portrait){.kick{flex-direction:column}}
+#app{min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.home{flex:1;display:flex;flex-direction:column;font-size:15px}.home .btn{padding:11px 12px}.home .box{padding:12px 10px 10px}.home .plate.l{min-width:96px;height:60px;font-size:27px}.home .ttl{font-size:22px}.grow{flex:1}
 </style></head><body><div id="rot">Rotate to landscape for the best fit</div><div id="app"></div><div id="toast"></div>
 <script>
 // ---------- DATA: 32 teams (id|city|name|primary|secondary|conf+div) ----------
@@ -82,7 +93,7 @@ WAS|Washington|Commanders|5A1414|FFB612|NE`.split("\n").map(l=>{const[id,city,na
 const T=id=>TEAMS.find(t=>t.id==id);
 // roster: 12 offense + 12 defense + K/P, plus backups on a 12-slot bench page (empty slots allowed)
 const LAYOUT=[["QB",1],["RB",2],["WR",3],["TE",2],["OL",4],["DL",4],["LB",3],["CB",3],["S",2],["K",1],["P",1]];
-const BENCH=["QB","RB","WR","TE","OL","DL","LB","CB","S"],SLOTS=Object.fromEntries(LAYOUT);
+const BENCH_O=["QB","RB","WR","TE","OL","OL"],BENCH_D=["DL","LB","CB","S","DL","LB"],SLOTS=Object.fromEntries(LAYOUT);
 const POS={QB:{a:["Accuracy","Arm","Awareness","Mobility"],n:[1,19],cap:55,side:"O"},RB:{a:["Speed","Elusiveness","Power","Hands"],n:[20,39],cap:14,side:"O"},WR:{a:["Speed","Hands","Routes","Contested"],n:[10,19],cap:35,side:"O"},TE:{a:["Hands","Blocking","Routes","Speed"],n:[80,89],cap:16,side:"O"},OL:{a:["Pass block","Run block","Strength","Awareness"],n:[60,79],cap:25,side:"O"},DL:{a:["Pass rush","Run stop","Strength","Speed"],n:[90,99],cap:32,side:"D"},LB:{a:["Tackling","Coverage","Run stop","Speed"],n:[50,59],cap:22,side:"D"},CB:{a:["Coverage","Speed","Ball skills","Tackling"],n:[20,39],cap:28,side:"D"},S:{a:["Coverage","Tackling","Ball skills","Range"],n:[20,39],cap:18,side:"D"},K:{a:["Power","Accuracy","Clutch","Kickoffs"],n:[1,19],cap:6,side:"K"},P:{a:["Power","Accuracy","Hang time","Directional"],n:[1,19],cap:4,side:"K"}};
 const FN="Jalen Marcus Devin Tyrell Caleb Isaiah Brandon Cole Dante Eli Jordan Kyle Malik Noah Owen Reggie Trey Wes Zach Andre".split(" ");
 const LN="Hayes Brooks Carter Dixon Ellis Foster Grant Hudson Irving Jenkins Knox Lawson Mills Nash Odom Pratt Quinn Reeds Sutton Tate Vance Walker Young".split(" ");
@@ -99,15 +110,15 @@ function makePlayer(pos,mean,bench,used){
 }
 function makeRoster(){const str=ri(56,74),used=new Set(),pl=[];
   for(const[pos,n]of LAYOUT)for(let i=0;i<n;i++)pl.push(makePlayer(pos,str-i*2,false,used));
-  for(const pos of BENCH)pl.push(makePlayer(pos,str-14,true,used));return pl}
+  for(const pos of [...BENCH_O,...BENCH_D])pl.push(makePlayer(pos,str-14,true,used));return pl}
 function newCareer(team){const league={};TEAMS.forEach(t=>league[t.id]=makeRoster());
   const picks=[];for(const t of TEAMS)for(let y=2027;y<=2029;y++)for(let rd=1;rd<=7;rd++)picks.push({y,rd,own:t.id,orig:t.id});
-  return{v:2,created:Date.now(),team,year:2026,week:1,fans:60,morale:80,league,picks,log:[]}}
+  return{v:3,created:Date.now(),team,year:2026,week:1,fans:60,morale:80,league,picks,log:[]}}
 // storage (IndexedDB) + export/import
 const DB=()=>new Promise((ok,no)=>{const r=indexedDB.open("retro-gridiron",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const kv=async(m,f)=>{const d=await DB();return new Promise((ok,no)=>{const t=d.transaction("kv",m);const q=f(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)})};
 const dbGet=k=>kv("readonly",s=>s.get(k)),dbPut=(k,v)=>kv("readwrite",s=>s.put(v,k)),dbDel=k=>kv("readwrite",s=>s.delete(k));
-const S={view:"title",optFrom:"title",set:{theme:"slate",sack:true,reveal:false,qmins:2},slot:null,career:null,tab:0,slots:[null,null,null]};
+const S={view:"title",optFrom:"title",set:{theme:"slate",sack:true,reveal:false,qmins:2},slot:null,career:null,tab:0,pg:0,slots:[null,null,null]};
 const $=s=>document.querySelector(s),toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2400)};
 async function save(){try{if(S.slot!=null&&S.career)await dbPut("slot"+S.slot,S.career);await dbPut("settings",S.set)}catch(e){toast("Could not save: storage unavailable")}}
 async function loadAll(){try{S.set={...S.set,...(await dbGet("settings")||{})};for(let i=0;i<3;i++){const c=await dbGet("slot"+i);S.slots[i]=c?{team:c.team,year:c.year,week:c.week}:null}}catch(e){}}
@@ -119,14 +130,14 @@ function theme(){const r=document.documentElement.style,t=S.career&&T(S.career.t
 const plate=(t,l)=>`<span class="plate ${l?"l":""}" style="background:${t.c1};color:${t.c2};border-color:${t.c2}">${t.id}</span>`;
 const banner=(x,sub)=>`<div class="ttl"><span class="s r">★</span><span class="s">★</span><span class="s n">★</span> ${x} <span class="s n">★</span><span class="s">★</span><span class="s r">★</span>${sub?`<small>${sub}</small>`:""}</div>`;
 const stars=b=>{let o="";for(let i=0;i<5;i++)o+=`<span class="st" style="--p:${cl((b-i*2)/2,0,1)*100}%">★</span>`;return o};
-const bars=p=>cl(Math.round(p.shown/10),1,10),HEAD={O:"#35b4ff",D:"#ff4d57",K:"#ff9a2e"};
+const bars=p=>cl(Math.round(p.shown/10),1,10),HEAD={O:"#4cb9f2",D:"#ef3b3b",K:"#e8650f"};
 const teamStars=(ps,sd)=>{const a=ps.filter(p=>!p.bench&&POS[p.pos].side==sd);return Math.round(a.reduce((s,p)=>s+bars(p),0)/a.length)};
 const capUsed=ps=>ps.reduce((s,p)=>s+p.sal,0);
 const face=(f,t)=>{const[s,h,st,bd]=f,sk=SKIN[s],hc=HAIR[h],R=(x,y,w,hh,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="${c}"/>`;
   return`<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${R(2,12,12,4,t.c1)}${R(2,12,12,1,t.c2)}${R(6,10,4,2,sk)}${R(4,3,8,7,sk)}${st==1?"":st==2?R(3,1,10,3,hc)+R(3,3,1,3,hc)+R(12,3,1,3,hc):R(4,2,8,2,hc)+(st==3?R(4,4,1,2,hc)+R(11,4,1,2,hc):"")}${bd?R(4,8,8,2,hc)+R(7,8,2,1,sk):R(7,8,2,1,"#8a3b3b")}${R(6,6,1,1,"#111")}${R(9,6,1,1,"#111")}</svg>`};
-const card=(p,t)=>`<div class="card" data-a="player" data-id="${p.id}"><div class="pic" style="background-color:${HEAD[POS[p.pos].side]}"><b>${p.pos} ${p.num}</b><i class="face ${p.morale>80?"":p.morale>60?"mid":"lo"}" style="position:absolute"></i><div class="fc">${face(p.face,t)}</div></div><div class="n"><span>${p.name.split(" ")[1]}</span>${stars(bars(p))}</div><div class="bar g"><i style="width:${p.cond}%"></i></div></div>`;
-const filler=pos=>`<div class="card x"><div class="pic" style="background-color:#666"><b>${pos}</b></div><div class="n"><span>Filler</span>${stars(2)}</div></div>`;
-const emptyC=()=>`<div class="card x"><div class="pic" style="background-color:#0000"></div><div class="n"><span>Empty</span><span>&nbsp;</span></div></div>`;
+const card=(p,t)=>`<div class="card" data-a="player" data-id="${p.id}"><div class="pic" style="background-color:${HEAD[POS[p.pos].side]}"><b>${p.pos}</b><u>#${p.num}</u><i class="face ${p.morale>80?"":p.morale>60?"mid":"lo"}"></i><div class="fc">${face(p.face,t)}</div></div><div class="n"><div class="nm">${p.name.split(" ")[1]}</div><div class="stars">${stars(bars(p))}</div></div><div class="bar g"><i style="width:${p.cond}%"></i></div></div>`;
+const filler=pos=>`<div class="card x"><div class="pic" style="background-color:#666"><b>${pos}</b></div><div class="n"><div class="nm">Filler</div><div class="stars">${stars(2)}</div></div></div>`;
+const emptyC=()=>`<div class="card x"><div class="pic" style="background-color:#0000"></div><div class="n"><div class="nm">Empty</div><div class="stars">&nbsp;</div></div></div>`;
 function slotsFor(ps,sd,t){const out=[];for(const[pos,n]of LAYOUT){if(POS[pos].side!=sd)continue;const a=ps.filter(p=>p.pos==pos&&!p.bench).sort((x,y)=>y.shown-x.shown);for(let i=0;i<n;i++)out.push(a[i]?card(a[i],t):filler(pos))}return out}
 // views
 const V={
@@ -137,17 +148,20 @@ teams(){const col=(cf,dv)=>`<div class="sp"><div class="dim" style="font-size:10
   return banner("CHOOSE YOUR TEAM")+`<div class="row"><span>League players:</span><button class="btn on">Fictional</button><button class="btn dim" data-a="soon" data-m="Real players arrive in the data phase">Real</button><span class="sp"></span><button class="btn" data-a="go" data-v="title">Back</button></div><div class="row" style="align-items:stretch;flex-wrap:nowrap">${box("AFC")}${box("NFC")}</div>`},
 home(){const c=S.career,t=T(c.team),ps=c.league[t.id],opp=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf&&x.id!=t.id),o=opp[(c.week-1)%opp.length],o2=opp[c.week%opp.length];
   const div=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf).map(x=>`<div class="row"><span class="sp" style="${x.id==t.id?"color:var(--acc)":""}">${x.name}</span><span>0-0-0</span></div>`).join("");
-  return banner("YEAR "+(c.year-2025),`${t.city} ${t.name}`)+`<div class="box"><h3>SCHEDULE</h3><div class="row" style="justify-content:space-around;text-align:center"><div>${plate(o,1)}<br>Week ${c.week} vs ${o.id}</div><div>${plate(o2,1)}<br>Week ${c.week+1} at ${o2.id}</div></div></div>
-<div class="row" style="align-items:stretch;flex-wrap:nowrap"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:8px"><span>Morale ${c.morale}%</span><span class="sp"></span></div><div class="row"><span>OFF ${stars(teamStars(ps,"O"))}</span><span class="sp"></span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
-<div class="row"><button class="btn" data-a="opts" data-from="home">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div>`},
-roster(){const c=S.career,t=T(c.team),ps=c.league[t.id],B=[...ps.filter(p=>POS[p.pos].side=="K"),...ps.filter(p=>p.bench)].map(p=>card(p,t));while(B.length<12)B.push(emptyC());
-  const pages=[slotsFor(ps,"O",t),slotsFor(ps,"D",t),B];
-  return`<div class="row" style="margin-bottom:6px"><button class="btn" data-a="go" data-v="home">Home</button>${["Offense","Defense","Bench"].map((n,i)=>`<button class="btn tb ${S.tab==i?"on":""}" data-a="tab" data-t="${i}">${n}</button>`).join("")}<span class="sp"></span><span>Cap ${capUsed(ps).toFixed(0)}M / 280M</span></div><div class="pages" id="pg">${pages.map(g=>`<div class="page grid">${g.join("")}</div>`).join("")}</div>`},
+  return`<div class="home">${banner("YEAR "+(c.year-2025),`${t.city} ${t.name}`)}<div class="box"><h3>SCHEDULE</h3><div class="row" style="justify-content:space-around;text-align:center"><div>${plate(o,1)}<br>Week ${c.week} vs ${o.id}</div><div>${plate(o2,1)}<br>Week ${c.week+1} at ${o2.id}</div></div></div>
+<div class="row grow" style="align-items:stretch;flex-wrap:nowrap"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:10px"><span>Morale ${c.morale}%</span></div><div class="row" style="margin-top:6px"><span>OFF ${stars(teamStars(ps,"O"))}</span><span class="sp"></span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
+<div class="row"><button class="btn" data-a="opts" data-from="home">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div></div>`},
+kick(ps,t){return`<div class="page kick">`+ps.filter(p=>POS[p.pos].side=="K").map(p=>{const off=S.set.reveal?0:p.shown-p.ovr,st=p.pos=="K"?"FG 0/0 | Long 0":"Punts 0 | Avg 0";
+  return`<div class="kp"><div class="kc">${card(p,t)}</div><div class="sp"><div style="font-size:14px">${p.pos=="K"?"Kicker":"Punter"}: ${p.name}</div><div class="dim">#${p.num} | Age ${p.age} | $${p.sal}M (${p.yrs}y)</div><div style="margin:4px 0">${st}</div>${POS[p.pos].a.map((a,i)=>`<div>${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}</div></div>`}).join("")+`</div>`},
+roster(){const c=S.career,t=T(c.team),ps=c.league[t.id],sd=S.tab==0?"O":"D";let pages,bc=0;
+  if(S.tab==2)pages=[V.kick(ps,t)];else{const bn=ps.filter(p=>p.bench&&POS[p.pos].side==sd);bc=bn.length;const b=bn.map(p=>card(p,t));while(b.length<12)b.push(emptyC());pages=[`<div class="page grid">${slotsFor(ps,sd,t).join("")}</div>`,`<div class="page grid">${b.join("")}</div>`]}
+  const dots=S.tab==2?"":`<span class="pgl"><span id="pgl">${S.pg?"Bench":"Starters"}</span> <i class="dot ${S.pg?"":"on"}"></i><i class="dot ${S.pg?"on":""}"></i></span>`;
+  return`<div class="row" style="margin-bottom:6px"><button class="btn" data-a="go" data-v="home">Home</button>${["Offense","Defense","Kicking"].map((n,i)=>`<button class="btn tb ${S.tab==i?"on":""}" data-a="tab" data-t="${i}">${n}</button>`).join("")}<span class="sp"></span>${dots}<span style="margin-left:10px">Cap ${capUsed(ps).toFixed(0)}M/280M</span></div><div class="pages" id="pg">${pages.join("")}</div>`},
 opts(){const o=S.set,b=(k,v,l)=>`<button class="btn ${o[k]==v?"on":""}" data-a="set" data-k="${k}" data-v="${v}">${l}</button>`;
   return banner("OPTIONS")+(S.optFrom=="home"?`<div class="box"><h3>LOOK</h3><div class="row"><span>Menu colours</span>${b("theme","slate","Slate")}${b("theme","team","Team colours")}</div></div>`:"")+`<div class="box"><h3>GAME</h3><div class="row"><span>Get sacked</span>${b("sack",true,"On")}${b("sack",false,"Off")}</div><div class="row"><span>Quarters</span>${[1,2,3,4,5].map(m=>b("qmins",m,m+"m")).join("")}</div><div class="row"><span>True ratings</span>${b("reveal",false,"Hidden")}${b("reveal",true,"Revealed")}</div></div><button class="btn" data-a="go" data-v="${S.optFrom}">Back</button>`}
 };
 function render(){theme();$("#app").innerHTML=V[S.view]();const pg=$("#pg");
-  if(pg){pg.scrollLeft=S.tab*pg.clientWidth;pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!=S.tab){S.tab=i;document.querySelectorAll(".tb").forEach((b,j)=>b.classList.toggle("on",j==i))}}}}
+  if(pg){pg.scrollLeft=S.pg*pg.clientWidth;pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!=S.pg){S.pg=i;document.querySelectorAll(".dot").forEach((d,j)=>d.classList.toggle("on",j==i));const l=$("#pgl");if(l)l.textContent=i?"Bench":"Starters"}}}}
 function player(id){const ps=S.career.league[S.career.team],p=ps.find(x=>x.id==id),P=POS[p.pos],off=S.set.reveal?0:p.shown-p.ovr,kk=P.side=="K";
   const mates=kk?[]:ps.filter(x=>x.pos==p.pos&&x.bench!=p.bench),free=p.bench&&ps.filter(x=>x.pos==p.pos&&!x.bench).length<SLOTS[p.pos];
   const act=kk?"":(free?`<button class="btn" data-a="flip" data-id="${p.id}">Start</button>`:"")+(!p.bench?`<button class="btn" data-a="flip" data-id="${p.id}">Rest (bench)</button>`:"")+mates.map(m=>`<button class="btn" data-a="swap" data-id="${p.id}" data-b="${m.id}">Swap: ${m.name.split(" ")[1]} ${stars(bars(m))}</button>`).join("");
@@ -160,15 +174,15 @@ document.addEventListener("click",async e=>{
   else if(a=="soon")toast(d.m);
   else if(a=="new"){S.slot=+d.i;S.view="teams";render()}
   else if(a=="pick"){S.career=newCareer(d.id);S.view="home";await save();S.slots[S.slot]={team:d.id,year:2026,week:1};render()}
-  else if(a=="load"){S.slot=+d.i;let c=await dbGet("slot"+d.i);if(c.v<2){c=newCareer(c.team);toast("Old save upgraded to the new roster layout")}S.career=c;S.view="home";await save();render()}
+  else if(a=="load"){S.slot=+d.i;let c=await dbGet("slot"+d.i);if(c.v<3){c=newCareer(c.team);toast("Old save upgraded to the new roster layout")}S.career=c;S.view="home";await save();render()}
   else if(a=="del"){if(confirm("Delete this career? Export it first if you want a backup.")){await dbDel("slot"+d.i);S.slots[+d.i]=null;render()}}
   else if(a=="exp"){const c=await dbGet("slot"+d.i),u=URL.createObjectURL(new Blob([JSON.stringify(c)],{type:"application/json"})),l=document.createElement("a");l.href=u;l.download="retro-gridiron-slot"+(+d.i+1)+".json";l.click();setTimeout(()=>URL.revokeObjectURL(u),3e3)}
   else if(a=="imp"){const f=$("#file");f.onchange=async()=>{try{const c=JSON.parse(await f.files[0].text());if(!c.league)throw 0;await dbPut("slot"+d.i,c);S.slots[+d.i]={team:c.team,year:c.year,week:c.week};render();toast("Imported")}catch(x){toast("That file is not a valid save")}};f.click()}
-  else if(a=="tab"){const pg=$("#pg");pg.scrollTo({left:+d.t*pg.clientWidth,behavior:"smooth"})}
+  else if(a=="tab"){S.tab=+d.t;S.pg=0;render()}
   else if(a=="set"){S.set[d.k]=d.v=="true"?true:d.v=="false"?false:isNaN(d.v)?d.v:+d.v;await save();render()}
   else if(a=="player")player(d.id);
   else if(a=="close")document.querySelector(".mod").remove();
-  else if(a=="flip"){const p=ps.find(x=>x.id==d.id);if(!p.bench&&ps.filter(x=>x.bench||POS[x.pos].side=="K").length>=12)return toast("Bench is full (12 spots)");p.bench=!p.bench;changed()}
+  else if(a=="flip"){const p=ps.find(x=>x.id==d.id);if(!p.bench&&ps.filter(x=>x.bench&&POS[x.pos].side==POS[p.pos].side).length>=12)return toast("Bench is full (12 spots)");p.bench=!p.bench;changed()}
   else if(a=="swap"){const p=ps.find(x=>x.id==d.id),q=ps.find(x=>x.id==d.b);[p.bench,q.bench]=[q.bench,p.bench];changed()}
 });
 loadAll().then(render);render();
