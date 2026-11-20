@@ -2,37 +2,48 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#1c2740">
+<meta name="theme-color" content="#17284f">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
 <title>Retro Gridiron</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;min-height:100%}
-:root{--bg:#1c2740;--bg2:#2c3d63;--acc:#f2d216}
-body{font:700 15px/1.3 "Courier New",ui-monospace,monospace;color:#fff;letter-spacing:.5px;background:linear-gradient(160deg,var(--bg2),var(--bg)) fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+*{box-sizing:border-box}html{background:var(--bg);overscroll-behavior:none}html,body{margin:0;min-height:100%}
+:root{--bg:#17284f;--bg2:#27427f;--acc:#f5c518}
+body{font:700 12.5px/1.25 "Courier New",ui-monospace,monospace;color:#fff;letter-spacing:.4px;background:linear-gradient(160deg,var(--bg2),var(--bg)) fixed;min-height:100dvh;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
 body::before{content:"";position:fixed;inset:0;opacity:.06;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 8l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z' fill='white'/%3E%3C/svg%3E")}
-#app{position:relative;max-width:980px;margin:0 auto;padding:14px}
-#rot{display:none;text-align:center;font-size:12px;opacity:.7;padding:4px}
+#app{position:relative;max-width:980px;margin:0 auto;padding:8px 12px}
+#rot{display:none;text-align:center;font-size:11px;opacity:.7;padding:3px}
 @media(orientation:portrait){#rot{display:block}}
-.ttl{text-align:center;font-size:24px;margin:6px 0 14px;text-shadow:0 3px 0 #0007}.ttl small{display:block;font-size:13px;opacity:.75}
-.s{color:#fff}.s.r{color:#c8344a}.s.n{color:#3b4d9a}
-.box{border:3px solid #fff;border-radius:8px;padding:12px;margin:10px 0;position:relative}
-.box>h3{position:absolute;top:-11px;left:12px;margin:0;padding:0 6px;font-size:13px;background:var(--bg)}
-.btn{display:inline-block;border:3px solid #fff;border-radius:8px;padding:11px 14px;margin:4px;background:transparent;color:#fff;font:inherit;box-shadow:0 4px 0 #0007;cursor:pointer;text-align:center}
-.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0007}
+.ttl{text-align:center;font-size:18px;margin:2px 0 8px;text-shadow:0 2px 0 #0007}.ttl small{display:block;font-size:11px;opacity:.75}
+.s{color:#fff}.s.r{color:#e0405a}.s.n{color:#5a72d0}
+.box{border:2px solid #fff;border-radius:7px;padding:9px 8px 7px;margin:9px 0 6px;position:relative}
+.box>h3{position:absolute;top:-9px;left:10px;margin:0;padding:0 5px;font-size:11px;background:var(--bg)}
+.btn{display:inline-block;border:2px solid #fff;border-radius:7px;padding:8px 10px;margin:3px;background:transparent;color:#fff;font:inherit;box-shadow:0 3px 0 #0007;cursor:pointer;text-align:center}
+.btn:active{transform:translateY(2px);box-shadow:0 1px 0 #0007}
 .btn.on{background:var(--acc);color:#10182a;border-color:var(--acc)}
-.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.sp{flex:1}.dim{opacity:.6}
-.plate{display:inline-flex;align-items:center;justify-content:center;border:3px solid;border-radius:6px;min-width:64px;height:48px;font-size:18px;text-shadow:0 2px 0 #0006}
-.plate.l{min-width:92px;height:64px;font-size:26px}
-.bar{height:14px;background:#000;border-radius:3px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--acc)}.bar.g>i{background:#1fd01f}
-.st{display:inline-block;font-size:17px;background:linear-gradient(90deg,var(--acc) var(--p),#46526e var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
-.card{border:3px solid #fff;border-radius:6px;overflow:hidden;background:#3b4560;cursor:pointer}
-.card .h{display:flex;justify-content:space-between;padding:5px 7px;font-size:13px;color:#fff;text-shadow:0 1px 0 #0006}
-.card .n{padding:4px 7px;background:#4a5167}.card .n b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.face{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--acc);color:#10182a;font-size:11px;line-height:16px;text-align:center}
-.mod{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:14px;z-index:5}
-.mod>div{background:var(--bg);border:3px solid #fff;border-radius:10px;padding:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
-#toast{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#000c;border:2px solid #fff;border-radius:8px;padding:8px 14px;display:none;z-index:9}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:4px}.sp{flex:1}.dim{opacity:.6}
+.plate{display:inline-flex;align-items:center;justify-content:center;border:2px solid;border-radius:5px;min-width:54px;height:34px;font-size:15px;text-shadow:0 2px 0 #0006}
+.plate.l{min-width:76px;height:46px;font-size:21px}
+.bar{height:10px;background:#000;border-radius:3px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--acc)}.bar.g>i{background:#1fd01f}
+.st{display:inline-block;font-size:13px;line-height:1;background:linear-gradient(90deg,var(--acc) var(--p),#46526e var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
+.grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+@media(orientation:portrait){.grid{grid-template-columns:repeat(4,1fr)}}
+.pages{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}.pages::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;scroll-snap-align:start;align-content:start}
+.card{border:2px solid #fff;border-radius:6px;overflow:hidden;background:#3b4560;cursor:pointer;display:flex;flex-direction:column}
+.card.x{border-style:dashed;opacity:.5;cursor:default}
+.pic{position:relative;aspect-ratio:5/3;background-image:repeating-linear-gradient(135deg,#fff2 0 6px,#0000 6px 12px)}
+.pic>b{position:absolute;left:5px;top:3px;font-size:11px;z-index:1;text-shadow:0 1px 0 #0008}
+.pic .face{position:absolute;right:4px;top:3px;z-index:1}
+.fc{position:absolute;inset:0;display:flex;justify-content:center}.fc svg{height:100%;width:auto}
+.face{width:15px;height:15px;border-radius:50%;background:var(--acc);display:inline-block}
+.face::before{content:"";position:absolute;left:4px;top:5px;width:2px;height:2px;background:#10182a;box-shadow:5px 0 #10182a}
+.face::after{content:"";position:absolute;left:4px;top:8px;width:7px;height:3px;border-bottom:2px solid #10182a;border-radius:0 0 6px 6px}
+.face.mid::after{top:10px;height:0;border-radius:0}.face.lo{background:#ff8a3d}.face.lo::after{top:9px;border-bottom:0;border-top:2px solid #10182a;border-radius:6px 6px 0 0}
+.card .n{padding:3px 5px;background:#4a5167;display:flex;flex-direction:column}.card .n span{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tm{display:block;width:100%;padding:3px;margin:3px 0}.tm small{display:block;font-size:10px;margin-top:2px}
+.mod{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:10px;z-index:5}
+.mod>div{background:var(--bg);border:2px solid #fff;border-radius:10px;padding:12px;max-width:520px;width:100%;max-height:92vh;overflow:auto}
+#toast{position:fixed;bottom:calc(12px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#000c;border:2px solid #fff;border-radius:8px;padding:7px 12px;display:none;z-index:9}
 </style></head><body><div id="rot">Rotate to landscape for the best fit</div><div id="app"></div><div id="toast"></div>
 <script>
 // ---------- DATA: 32 teams (id|city|name|primary|secondary|conf+div) ----------
@@ -69,103 +80,96 @@ TB|Tampa Bay|Buccaneers|D50A0A|FF7900|NS
 TEN|Tennessee|Titans|0C2340|4B92DB|AS
 WAS|Washington|Commanders|5A1414|FFB612|NE`.split("\n").map(l=>{const[id,city,name,a,b,d]=l.split("|");return{id,city,name,c1:"#"+a,c2:"#"+b,conf:d[0]=="A"?"AFC":"NFC",div:{E:"East",N:"North",S:"South",W:"West"}[d[1]]}});
 const T=id=>TEAMS.find(t=>t.id==id);
-// roster: 13 offensive pool + 12 defense + K/P + 6 bench = 33
-const LAYOUT=[["QB",1],["RB",2],["WR",3],["TE",2],["OL",5],["DL",4],["LB",3],["CB",3],["S",2],["K",1],["P",1]];
-const BENCH=["QB","OL","DL","LB","CB","S"];
+// roster: 12 offense + 12 defense + K/P, plus backups on a 12-slot bench page (empty slots allowed)
+const LAYOUT=[["QB",1],["RB",2],["WR",3],["TE",2],["OL",4],["DL",4],["LB",3],["CB",3],["S",2],["K",1],["P",1]];
+const BENCH=["QB","RB","WR","TE","OL","DL","LB","CB","S"],SLOTS=Object.fromEntries(LAYOUT);
 const POS={QB:{a:["Accuracy","Arm","Awareness","Mobility"],n:[1,19],cap:55,side:"O"},RB:{a:["Speed","Elusiveness","Power","Hands"],n:[20,39],cap:14,side:"O"},WR:{a:["Speed","Hands","Routes","Contested"],n:[10,19],cap:35,side:"O"},TE:{a:["Hands","Blocking","Routes","Speed"],n:[80,89],cap:16,side:"O"},OL:{a:["Pass block","Run block","Strength","Awareness"],n:[60,79],cap:25,side:"O"},DL:{a:["Pass rush","Run stop","Strength","Speed"],n:[90,99],cap:32,side:"D"},LB:{a:["Tackling","Coverage","Run stop","Speed"],n:[50,59],cap:22,side:"D"},CB:{a:["Coverage","Speed","Ball skills","Tackling"],n:[20,39],cap:28,side:"D"},S:{a:["Coverage","Tackling","Ball skills","Range"],n:[20,39],cap:18,side:"D"},K:{a:["Power","Accuracy","Clutch","Kickoffs"],n:[1,19],cap:6,side:"K"},P:{a:["Power","Accuracy","Hang time","Directional"],n:[1,19],cap:4,side:"K"}};
 const FN="Jalen Marcus Devin Tyrell Caleb Isaiah Brandon Cole Dante Eli Jordan Kyle Malik Noah Owen Reggie Trey Wes Zach Andre".split(" ");
 const LN="Hayes Brooks Carter Dixon Ellis Foster Grant Hudson Irving Jenkins Knox Lawson Mills Nash Odom Pratt Quinn Reeds Sutton Tate Vance Walker Young".split(" ");
-// ---------- helpers ----------
+const SKIN=["#f2c9a0","#e0a878","#c68642","#8d5524","#5c3a21","#3b2416"],HAIR=["#1a1a1a","#4a3020","#8a5a2b","#d9b45a","#888"];
 let seed=Date.now()>>>0;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
-const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[ri(0,a.length-1)];
-const gauss=()=>(rnd()+rnd()+rnd()-1.5)*1.6;
-const hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
-const lum=h=>{const[r,g,b]=hex(h);return(.299*r+.587*g+.114*b)/255};
+const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[ri(0,a.length-1)],gauss=()=>(rnd()+rnd()+rnd()-1.5)*1.6;
+const hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16)),lum=h=>{const[r,g,b]=hex(h);return(.299*r+.587*g+.114*b)/255};
 const mix=(a,b,t)=>{const A=hex(a),B=hex(b);return"#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("")};
-// ---------- player + team generation ----------
 function makePlayer(pos,mean,bench,used){
   const P=POS[pos];let num;do{num=ri(P.n[0],P.n[1])}while(used.has(num));used.add(num);
-  const age=ri(21,35),rookie=age<=22&&rnd()<.5;
-  const attrs=P.a.map(()=>cl(Math.round(mean+gauss()*9),25,99));
-  const ovr=Math.round(attrs.reduce((a,b)=>a+b,0)/4);
-  const shown=cl(Math.round(ovr+gauss()*(rookie?6:2)),20,99); // hidden vs shown rating
-  return{id:"p"+Math.floor(rnd()*1e9),name:pick(FN)+" "+pick(LN),pos,num,age,attrs,ovr,shown,pot:cl(ovr+(age<25?ri(0,15):ri(0,2)),ovr,99),
-    sal:Math.max(.8,+(P.cap*Math.pow(ovr/99,3.2)).toFixed(1)),yrs:rookie?4:ri(1,5),rookie,bench,morale:ri(60,100),cond:ri(85,100),xp:0,gp:0,stats:{}};
+  const age=ri(21,35),rookie=age<=22&&rnd()<.5,attrs=P.a.map(()=>cl(Math.round(mean+gauss()*9),25,99)),ovr=Math.round(attrs.reduce((a,b)=>a+b,0)/4);
+  return{id:"p"+Math.floor(rnd()*1e9),name:pick(FN)+" "+pick(LN),pos,num,age,attrs,ovr,shown:cl(Math.round(ovr+gauss()*(rookie?6:2)),20,99),pot:cl(ovr+(age<25?ri(0,15):ri(0,2)),ovr,99),
+    sal:Math.max(.8,+(P.cap*Math.pow(ovr/99,3.2)).toFixed(1)),yrs:rookie?4:ri(1,5),rookie,bench,morale:ri(55,100),cond:ri(85,100),xp:0,gp:0,stats:{},face:[ri(0,5),ri(0,4),ri(0,3),rnd()<.35?1:0]};
 }
-function makeRoster(){
-  const str=ri(56,74),used=new Set(),pl=[];
+function makeRoster(){const str=ri(56,74),used=new Set(),pl=[];
   for(const[pos,n]of LAYOUT)for(let i=0;i<n;i++)pl.push(makePlayer(pos,str-i*2,false,used));
-  for(const pos of BENCH)pl.push(makePlayer(pos,str-14,true,used));
-  return pl;
-}
-function newCareer(team,real){
-  const league={};TEAMS.forEach(t=>league[t.id]=makeRoster());
+  for(const pos of BENCH)pl.push(makePlayer(pos,str-14,true,used));return pl}
+function newCareer(team){const league={};TEAMS.forEach(t=>league[t.id]=makeRoster());
   const picks=[];for(const t of TEAMS)for(let y=2027;y<=2029;y++)for(let rd=1;rd<=7;rd++)picks.push({y,rd,own:t.id,orig:t.id});
-  return{v:1,created:Date.now(),team,real:!!real,year:2026,week:1,fans:60,morale:80,league,picks,log:[]};
-}
-// ---------- storage (IndexedDB; Export/Import for backups) ----------
+  return{v:2,created:Date.now(),team,year:2026,week:1,fans:60,morale:80,league,picks,log:[]}}
+// storage (IndexedDB) + export/import
 const DB=()=>new Promise((ok,no)=>{const r=indexedDB.open("retro-gridiron",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const kv=async(m,f)=>{const d=await DB();return new Promise((ok,no)=>{const t=d.transaction("kv",m);const q=f(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)})};
 const dbGet=k=>kv("readonly",s=>s.get(k)),dbPut=(k,v)=>kv("readwrite",s=>s.put(v,k)),dbDel=k=>kv("readwrite",s=>s.delete(k));
-// ---------- state ----------
-const S={view:"title",set:{theme:"slate",sack:true,reveal:false,qmins:2},slot:null,career:null,tab:"O",slots:[null,null,null]};
-const $=s=>document.querySelector(s),toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2200)};
+const S={view:"title",optFrom:"title",set:{theme:"slate",sack:true,reveal:false,qmins:2},slot:null,career:null,tab:0,slots:[null,null,null]};
+const $=s=>document.querySelector(s),toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2400)};
 async function save(){try{if(S.slot!=null&&S.career)await dbPut("slot"+S.slot,S.career);await dbPut("settings",S.set)}catch(e){toast("Could not save: storage unavailable")}}
 async function loadAll(){try{S.set={...S.set,...(await dbGet("settings")||{})};for(let i=0;i<3;i++){const c=await dbGet("slot"+i);S.slots[i]=c?{team:c.team,year:c.year,week:c.week}:null}}catch(e){}}
-function theme(){
-  const r=document.documentElement.style,t=S.career&&T(S.career.team);let bg="#1c2740",bg2="#2c3d63",acc="#f2d216";
-  if(t){const a=lum(t.c2)>.2?t.c2:lum(t.c1)>.2?t.c1:acc;
-    if(S.set.theme=="team"){const k=lum(t.c1)>.15?.6:.1;bg=mix(mix(t.c1,"#0b1020",k),"#1c2740",.25);bg2=mix(mix(t.c1,"#0b1020",k*.5),"#2c3d63",.25);acc=a}else acc=a}
-  r.setProperty("--bg",bg);r.setProperty("--bg2",bg2);r.setProperty("--acc",acc);
-}
-// ---------- UI pieces ----------
+function theme(){const r=document.documentElement.style,t=S.career&&T(S.career.team),inC=t&&(S.view=="home"||S.view=="roster"||(S.view=="opts"&&S.optFrom=="home"));
+  let bg="#17284f",bg2="#27427f",acc="#f5c518";
+  if(inC&&S.set.theme=="team"){const k=lum(t.c1)>.15?.6:.1;bg=mix(mix(t.c1,"#0b1020",k),"#17284f",.25);bg2=mix(mix(t.c1,"#0b1020",k*.5),"#27427f",.25);acc=lum(t.c2)>.2?t.c2:lum(t.c1)>.2?t.c1:acc}
+  r.setProperty("--bg",bg);r.setProperty("--bg2",bg2);r.setProperty("--acc",acc)}
+// UI pieces
 const plate=(t,l)=>`<span class="plate ${l?"l":""}" style="background:${t.c1};color:${t.c2};border-color:${t.c2}">${t.id}</span>`;
 const banner=(x,sub)=>`<div class="ttl"><span class="s r">★</span><span class="s">★</span><span class="s n">★</span> ${x} <span class="s n">★</span><span class="s">★</span><span class="s r">★</span>${sub?`<small>${sub}</small>`:""}</div>`;
 const stars=b=>{let o="";for(let i=0;i<5;i++)o+=`<span class="st" style="--p:${cl((b-i*2)/2,0,1)*100}%">★</span>`;return o};
-const bars=p=>cl(Math.round(p.shown/10),1,10);
-const side=ps=>{const a=ps.filter(p=>!p.bench);return a.length?a:ps};
+const bars=p=>cl(Math.round(p.shown/10),1,10),HEAD={O:"#35b4ff",D:"#ff4d57",K:"#ff9a2e"};
 const teamStars=(ps,sd)=>{const a=ps.filter(p=>!p.bench&&POS[p.pos].side==sd);return Math.round(a.reduce((s,p)=>s+bars(p),0)/a.length)};
-const HEAD={O:"#4f8fc7",D:"#c0503f",K:"#d9792b"};
-const card=p=>`<div class="card" data-a="player" data-id="${p.id}"><div class="h" style="background:${HEAD[POS[p.pos].side]}"><span>${p.pos} #${p.num}</span><span class="face">${p.morale>75?"☺":"-"}</span></div><div class="n"><b>${p.name.split(" ")[1]}</b>${stars(bars(p))}<div class="bar g" style="margin-top:4px"><i style="width:${p.cond}%"></i></div></div></div>`;
-function capUsed(ps){return ps.reduce((s,p)=>s+p.sal,0)}
-// ---------- views ----------
+const capUsed=ps=>ps.reduce((s,p)=>s+p.sal,0);
+const face=(f,t)=>{const[s,h,st,bd]=f,sk=SKIN[s],hc=HAIR[h],R=(x,y,w,hh,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="${c}"/>`;
+  return`<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${R(2,12,12,4,t.c1)}${R(2,12,12,1,t.c2)}${R(6,10,4,2,sk)}${R(4,3,8,7,sk)}${st==1?"":st==2?R(3,1,10,3,hc)+R(3,3,1,3,hc)+R(12,3,1,3,hc):R(4,2,8,2,hc)+(st==3?R(4,4,1,2,hc)+R(11,4,1,2,hc):"")}${bd?R(4,8,8,2,hc)+R(7,8,2,1,sk):R(7,8,2,1,"#8a3b3b")}${R(6,6,1,1,"#111")}${R(9,6,1,1,"#111")}</svg>`};
+const card=(p,t)=>`<div class="card" data-a="player" data-id="${p.id}"><div class="pic" style="background-color:${HEAD[POS[p.pos].side]}"><b>${p.pos} ${p.num}</b><i class="face ${p.morale>80?"":p.morale>60?"mid":"lo"}" style="position:absolute"></i><div class="fc">${face(p.face,t)}</div></div><div class="n"><span>${p.name.split(" ")[1]}</span>${stars(bars(p))}</div><div class="bar g"><i style="width:${p.cond}%"></i></div></div>`;
+const filler=pos=>`<div class="card x"><div class="pic" style="background-color:#666"><b>${pos}</b></div><div class="n"><span>Filler</span>${stars(2)}</div></div>`;
+const emptyC=()=>`<div class="card x"><div class="pic" style="background-color:#0000"></div><div class="n"><span>Empty</span><span>&nbsp;</span></div></div>`;
+function slotsFor(ps,sd,t){const out=[];for(const[pos,n]of LAYOUT){if(POS[pos].side!=sd)continue;const a=ps.filter(p=>p.pos==pos&&!p.bench).sort((x,y)=>y.shown-x.shown);for(let i=0;i<n;i++)out.push(a[i]?card(a[i],t):filler(pos))}return out}
+// views
 const V={
 title(){const sl=S.slots.map((s,i)=>s?`<div class="row"><button class="btn sp" data-a="load" data-i="${i}">${plate(T(s.team))} Year ${s.year-2025}, Week ${s.week}</button><button class="btn" data-a="exp" data-i="${i}">Export</button><button class="btn" data-a="del" data-i="${i}">X</button></div>`:`<div class="row"><button class="btn sp" data-a="new" data-i="${i}">Slot ${i+1}: new career</button><button class="btn" data-a="imp" data-i="${i}">Import</button></div>`).join("");
-  return banner("RETRO GRIDIRON","Phase 1 skeleton")+`<div class="box"><h3>CAREERS</h3>${sl}</div><div class="row"><button class="btn" data-a="go" data-v="opts">Options</button></div><input id="file" type="file" accept=".json" hidden>`},
-teams(){const g=c=>TEAMS.filter(t=>t.conf==c).map(t=>`<button class="btn" data-a="pick" data-id="${t.id}">${plate(t)}<div style="font-size:12px;margin-top:4px">${t.name}</div></button>`).join("");
-  return banner("CHOOSE YOUR TEAM")+`<div class="row"><span>League players:</span><button class="btn on">Fictional</button><button class="btn dim" data-a="soon" data-m="Real players arrive in the data phase">Real</button></div><div class="box"><h3>AFC</h3><div class="row">${g("AFC")}</div></div><div class="box"><h3>NFC</h3><div class="row">${g("NFC")}</div></div><button class="btn" data-a="go" data-v="title">Back</button>`},
+  return banner("RETRO GRIDIRON","Phase 1 skeleton")+`<div class="box"><h3>CAREERS</h3>${sl}</div><button class="btn" data-a="opts" data-from="title">Options</button><input id="file" type="file" accept=".json" hidden>`},
+teams(){const col=(cf,dv)=>`<div class="sp"><div class="dim" style="font-size:10px;text-align:center">${dv}</div>${TEAMS.filter(t=>t.conf==cf&&t.div==dv).map(t=>`<button class="btn tm" data-a="pick" data-id="${t.id}">${plate(t)}<small>${t.name}</small></button>`).join("")}</div>`;
+  const box=cf=>`<div class="box sp"><h3>${cf}</h3><div class="row" style="align-items:flex-start;flex-wrap:nowrap">${["East","North","South","West"].map(d=>col(cf,d)).join("")}</div></div>`;
+  return banner("CHOOSE YOUR TEAM")+`<div class="row"><span>League players:</span><button class="btn on">Fictional</button><button class="btn dim" data-a="soon" data-m="Real players arrive in the data phase">Real</button><span class="sp"></span><button class="btn" data-a="go" data-v="title">Back</button></div><div class="row" style="align-items:stretch;flex-wrap:nowrap">${box("AFC")}${box("NFC")}</div>`},
 home(){const c=S.career,t=T(c.team),ps=c.league[t.id],opp=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf&&x.id!=t.id),o=opp[(c.week-1)%opp.length],o2=opp[c.week%opp.length];
   const div=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf).map(x=>`<div class="row"><span class="sp" style="${x.id==t.id?"color:var(--acc)":""}">${x.name}</span><span>0-0-0</span></div>`).join("");
   return banner("YEAR "+(c.year-2025),`${t.city} ${t.name}`)+`<div class="box"><h3>SCHEDULE</h3><div class="row" style="justify-content:space-around;text-align:center"><div>${plate(o,1)}<br>Week ${c.week} vs ${o.id}</div><div>${plate(o2,1)}<br>Week ${c.week+1} at ${o2.id}</div></div></div>
-<div class="row" style="align-items:stretch"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:10px"><span>Morale ${c.morale}%</span><span class="sp"></span><span>OFF ${stars(teamStars(ps,"O"))}</span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
-<div class="row"><button class="btn" data-a="go" data-v="opts">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div>`},
-roster(){const c=S.career,ps=c.league[c.team],tb={O:"Offense",D:"Defense",K:"Kicking",B:"Bench"},list=ps.filter(p=>S.tab=="B"?p.bench:!p.bench&&POS[p.pos].side==S.tab);
-  const cap=capUsed(ps);
-  return banner("ROSTER",`${ps.length} players`)+`<div class="row">${Object.keys(tb).map(k=>`<button class="btn ${S.tab==k?"on":""}" data-a="tab" data-t="${k}">${tb[k]}</button>`).join("")}</div><div class="grid" style="margin-top:8px">${list.map(card).join("")}</div>
-<div class="box"><h3>SALARY CAP ${cap.toFixed(0)}M / 280M</h3><div class="bar"><i style="width:${Math.min(100,cap/2.8)}%"></i></div></div><button class="btn" data-a="go" data-v="home">Home</button>`},
+<div class="row" style="align-items:stretch;flex-wrap:nowrap"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:8px"><span>Morale ${c.morale}%</span><span class="sp"></span></div><div class="row"><span>OFF ${stars(teamStars(ps,"O"))}</span><span class="sp"></span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
+<div class="row"><button class="btn" data-a="opts" data-from="home">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div>`},
+roster(){const c=S.career,t=T(c.team),ps=c.league[t.id],B=[...ps.filter(p=>POS[p.pos].side=="K"),...ps.filter(p=>p.bench)].map(p=>card(p,t));while(B.length<12)B.push(emptyC());
+  const pages=[slotsFor(ps,"O",t),slotsFor(ps,"D",t),B];
+  return`<div class="row" style="margin-bottom:6px"><button class="btn" data-a="go" data-v="home">Home</button>${["Offense","Defense","Bench"].map((n,i)=>`<button class="btn tb ${S.tab==i?"on":""}" data-a="tab" data-t="${i}">${n}</button>`).join("")}<span class="sp"></span><span>Cap ${capUsed(ps).toFixed(0)}M / 280M</span></div><div class="pages" id="pg">${pages.map(g=>`<div class="page grid">${g.join("")}</div>`).join("")}</div>`},
 opts(){const o=S.set,b=(k,v,l)=>`<button class="btn ${o[k]==v?"on":""}" data-a="set" data-k="${k}" data-v="${v}">${l}</button>`;
-  return banner("OPTIONS")+`<div class="box"><h3>LOOK</h3><div class="row"><span>Menu colours</span>${b("theme","slate","Slate + team accent")}${b("theme","team","Team colours")}</div></div>
-<div class="box"><h3>GAME</h3><div class="row"><span>Get sacked</span>${b("sack",true,"On")}${b("sack",false,"Off")}</div><div class="row"><span>Quarters</span>${[1,2,3,4,5].map(m=>b("qmins",m,m+"m")).join("")}</div><div class="row"><span>True ratings</span>${b("reveal",false,"Hidden")}${b("reveal",true,"Revealed")}</div></div>
-<div class="box"><h3>INSTALL</h3><div class="dim">Safari: Share, then Add to Home Screen. After the first load the game works offline.</div></div><button class="btn" data-a="go" data-v="${S.career?"home":"title"}">Back</button>`}
+  return banner("OPTIONS")+(S.optFrom=="home"?`<div class="box"><h3>LOOK</h3><div class="row"><span>Menu colours</span>${b("theme","slate","Slate")}${b("theme","team","Team colours")}</div></div>`:"")+`<div class="box"><h3>GAME</h3><div class="row"><span>Get sacked</span>${b("sack",true,"On")}${b("sack",false,"Off")}</div><div class="row"><span>Quarters</span>${[1,2,3,4,5].map(m=>b("qmins",m,m+"m")).join("")}</div><div class="row"><span>True ratings</span>${b("reveal",false,"Hidden")}${b("reveal",true,"Revealed")}</div></div><button class="btn" data-a="go" data-v="${S.optFrom}">Back</button>`}
 };
-function render(){theme();$("#app").innerHTML=V[S.view]()}
-// ---------- actions ----------
-function player(id){const p=S.career.league[S.career.team].find(x=>x.id==id),off=S.set.reveal?0:p.shown-p.ovr,P=POS[p.pos];
-  const m=document.createElement("div");m.className="mod";m.innerHTML=`<div><h2 style="margin:0 0 8px">${p.pos} #${p.num} ${p.name}</h2><div>Age ${p.age} | $${p.sal}M (${p.yrs}y) | Morale ${p.morale}%${p.rookie?" | Rookie":""}</div><div style="margin:8px 0">Rating ${stars(bars(p))}${S.set.reveal?` <span class="dim">(true ${p.ovr})</span>`:""}</div>${P.a.map((a,i)=>`<div style="margin-top:6px">${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}<button class="btn" style="margin-top:12px" data-a="close">Close</button></div>`;document.body.appendChild(m)}
+function render(){theme();$("#app").innerHTML=V[S.view]();const pg=$("#pg");
+  if(pg){pg.scrollLeft=S.tab*pg.clientWidth;pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!=S.tab){S.tab=i;document.querySelectorAll(".tb").forEach((b,j)=>b.classList.toggle("on",j==i))}}}}
+function player(id){const ps=S.career.league[S.career.team],p=ps.find(x=>x.id==id),P=POS[p.pos],off=S.set.reveal?0:p.shown-p.ovr,kk=P.side=="K";
+  const mates=kk?[]:ps.filter(x=>x.pos==p.pos&&x.bench!=p.bench),free=p.bench&&ps.filter(x=>x.pos==p.pos&&!x.bench).length<SLOTS[p.pos];
+  const act=kk?"":(free?`<button class="btn" data-a="flip" data-id="${p.id}">Start</button>`:"")+(!p.bench?`<button class="btn" data-a="flip" data-id="${p.id}">Rest (bench)</button>`:"")+mates.map(m=>`<button class="btn" data-a="swap" data-id="${p.id}" data-b="${m.id}">Swap: ${m.name.split(" ")[1]} ${stars(bars(m))}</button>`).join("");
+  const m=document.createElement("div");m.className="mod";m.innerHTML=`<div><h2 style="margin:0 0 6px;font-size:16px">${p.pos} #${p.num} ${p.name}</h2><div>Age ${p.age} | $${p.sal}M (${p.yrs}y) | Morale ${p.morale}%${p.rookie?" | Rookie":""}${p.bench?" | Bench":""}</div><div style="margin:6px 0">Rating ${stars(bars(p))}${S.set.reveal?` <span class="dim">(true ${p.ovr})</span>`:""}</div>${P.a.map((a,i)=>`<div style="margin-top:5px">${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}<div class="row" style="margin-top:10px">${act}<button class="btn" data-a="close">Close</button></div></div>`;document.body.appendChild(m)}
+async function changed(){document.querySelector(".mod")?.remove();await save();render()}
 document.addEventListener("click",async e=>{
-  const b=e.target.closest("[data-a]");if(!b)return;const d=b.dataset,a=d.a;
+  const b=e.target.closest("[data-a]");if(!b)return;const d=b.dataset,a=d.a,ps=S.career&&S.career.league[S.career.team];
   if(a=="go"){S.view=d.v;render()}
+  else if(a=="opts"){S.optFrom=d.from;S.view="opts";render()}
   else if(a=="soon")toast(d.m);
   else if(a=="new"){S.slot=+d.i;S.view="teams";render()}
-  else if(a=="pick"){S.career=newCareer(d.id,false);S.view="home";await save();S.slots[S.slot]={team:d.id,year:2026,week:1};render()}
-  else if(a=="load"){S.slot=+d.i;S.career=await dbGet("slot"+d.i);S.view="home";render()}
+  else if(a=="pick"){S.career=newCareer(d.id);S.view="home";await save();S.slots[S.slot]={team:d.id,year:2026,week:1};render()}
+  else if(a=="load"){S.slot=+d.i;let c=await dbGet("slot"+d.i);if(c.v<2){c=newCareer(c.team);toast("Old save upgraded to the new roster layout")}S.career=c;S.view="home";await save();render()}
   else if(a=="del"){if(confirm("Delete this career? Export it first if you want a backup.")){await dbDel("slot"+d.i);S.slots[+d.i]=null;render()}}
   else if(a=="exp"){const c=await dbGet("slot"+d.i),u=URL.createObjectURL(new Blob([JSON.stringify(c)],{type:"application/json"})),l=document.createElement("a");l.href=u;l.download="retro-gridiron-slot"+(+d.i+1)+".json";l.click();setTimeout(()=>URL.revokeObjectURL(u),3e3)}
   else if(a=="imp"){const f=$("#file");f.onchange=async()=>{try{const c=JSON.parse(await f.files[0].text());if(!c.league)throw 0;await dbPut("slot"+d.i,c);S.slots[+d.i]={team:c.team,year:c.year,week:c.week};render();toast("Imported")}catch(x){toast("That file is not a valid save")}};f.click()}
-  else if(a=="tab"){S.tab=d.t;render()}
+  else if(a=="tab"){const pg=$("#pg");pg.scrollTo({left:+d.t*pg.clientWidth,behavior:"smooth"})}
   else if(a=="set"){S.set[d.k]=d.v=="true"?true:d.v=="false"?false:isNaN(d.v)?d.v:+d.v;await save();render()}
   else if(a=="player")player(d.id);
   else if(a=="close")document.querySelector(".mod").remove();
+  else if(a=="flip"){const p=ps.find(x=>x.id==d.id);if(!p.bench&&ps.filter(x=>x.bench||POS[x.pos].side=="K").length>=12)return toast("Bench is full (12 spots)");p.bench=!p.bench;changed()}
+  else if(a=="swap"){const p=ps.find(x=>x.id==d.id),q=ps.find(x=>x.id==d.b);[p.bench,q.bench]=[q.bench,p.bench];changed()}
 });
 loadAll().then(render);render();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
