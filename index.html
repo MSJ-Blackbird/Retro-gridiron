@@ -55,6 +55,15 @@ body::before{content:"";position:fixed;inset:0;opacity:.06;pointer-events:none;b
 @media(orientation:portrait){.kick{flex-direction:column}}
 #app{min-height:calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));display:flex;flex-direction:column}
 .home{flex:1;display:flex;flex-direction:column;font-size:15px}.home .btn{padding:11px 12px}.home .box{padding:12px 10px 10px}.home .plate.l{min-width:96px;height:60px;font-size:27px}.home .ttl{font-size:22px}.grow{flex:1}
+.card .n .st,.st{text-shadow:none}.stars{filter:drop-shadow(0 1px 0 #000)}
+.card.bn .pic{background-color:#808896!important}.card.bn .fc{filter:saturate(.55)}
+.tag{position:absolute;right:0;bottom:0;background:var(--acc);color:#10182a;font-size:9px;font-style:normal;text-decoration:none;padding:1px 5px;border-radius:5px 0 0 0;z-index:1}
+.face{width:22px;height:22px;border:2px solid #10182a;border-radius:50%;position:relative;display:inline-block;vertical-align:middle;background:#f5c518}
+.face.hi{background:#3ddc4f}.face.mid{background:#f5c518}.face.lo{background:#ff5a3c}
+.face::before{content:"";position:absolute;left:4px;top:5px;width:3px;height:3px;background:#10182a;box-shadow:7px 0 #10182a}
+.face::after{content:"";position:absolute;left:4px;top:10px;width:10px;height:5px;border:0;border-bottom:2px solid #10182a;border-radius:0 0 8px 8px}
+.face.mid::after{top:12px;height:0;border-radius:0}.face.lo::after{top:11px;border-bottom:0;border-top:2px solid #10182a;border-radius:8px 8px 0 0}
+.pic .face{right:3px;top:3px}
 </style></head><body><div id="rot">Rotate to landscape for the best fit</div><div id="app"></div><div id="toast"></div>
 <script>
 // ---------- DATA: 32 teams (id|city|name|primary|secondary|conf+div) ----------
@@ -95,6 +104,7 @@ const T=id=>TEAMS.find(t=>t.id==id);
 const LAYOUT=[["QB",1],["RB",2],["WR",3],["TE",2],["OL",4],["DL",4],["LB",3],["CB",3],["S",2],["K",1],["P",1]];
 const BENCH_O=["QB","RB","WR","TE","OL","OL"],BENCH_D=["DL","LB","CB","S","DL","LB"],SLOTS=Object.fromEntries(LAYOUT);
 const POS={QB:{a:["Accuracy","Arm","Awareness","Mobility"],n:[1,19],cap:55,side:"O"},RB:{a:["Speed","Elusiveness","Power","Hands"],n:[20,39],cap:14,side:"O"},WR:{a:["Speed","Hands","Routes","Contested"],n:[10,19],cap:35,side:"O"},TE:{a:["Hands","Blocking","Routes","Speed"],n:[80,89],cap:16,side:"O"},OL:{a:["Pass block","Run block","Strength","Awareness"],n:[60,79],cap:25,side:"O"},DL:{a:["Pass rush","Run stop","Strength","Speed"],n:[90,99],cap:32,side:"D"},LB:{a:["Tackling","Coverage","Run stop","Speed"],n:[50,59],cap:22,side:"D"},CB:{a:["Coverage","Speed","Ball skills","Tackling"],n:[20,39],cap:28,side:"D"},S:{a:["Coverage","Tackling","Ball skills","Range"],n:[20,39],cap:18,side:"D"},K:{a:["Power","Accuracy","Clutch","Kickoffs"],n:[1,19],cap:6,side:"K"},P:{a:["Power","Accuracy","Hang time","Directional"],n:[1,19],cap:4,side:"K"}};
+const SK={QB:"Passing",RB:"Rushing",WR:"Receiving",TE:"Receiving",OL:"Blocking",DL:"Pass rush",LB:"Tackling",CB:"Coverage",S:"Coverage",K:"Kicking",P:"Punting"},SPD={QB:-4,RB:8,WR:8,TE:0,OL:-12,DL:-4,LB:2,CB:8,S:5,K:-10,P:-10},STR={QB:-2,RB:0,WR:-4,TE:4,OL:10,DL:8,LB:4,CB:-6,S:-4,K:-8,P:-8},PO=LAYOUT.map(x=>x[0]);
 const FN="Jalen Marcus Devin Tyrell Caleb Isaiah Brandon Cole Dante Eli Jordan Kyle Malik Noah Owen Reggie Trey Wes Zach Andre".split(" ");
 const LN="Hayes Brooks Carter Dixon Ellis Foster Grant Hudson Irving Jenkins Knox Lawson Mills Nash Odom Pratt Quinn Reeds Sutton Tate Vance Walker Young".split(" ");
 const SKIN=["#f2c9a0","#e0a878","#c68642","#8d5524","#5c3a21","#3b2416"],HAIR=["#1a1a1a","#4a3020","#8a5a2b","#d9b45a","#888"];
@@ -106,14 +116,14 @@ function makePlayer(pos,mean,bench,used){
   const P=POS[pos];let num;do{num=ri(P.n[0],P.n[1])}while(used.has(num));used.add(num);
   const age=ri(21,35),rookie=age<=22&&rnd()<.5,attrs=P.a.map(()=>cl(Math.round(mean+gauss()*9),25,99)),ovr=Math.round(attrs.reduce((a,b)=>a+b,0)/4);
   return{id:"p"+Math.floor(rnd()*1e9),name:pick(FN)+" "+pick(LN),pos,num,age,attrs,ovr,shown:cl(Math.round(ovr+gauss()*(rookie?6:2)),20,99),pot:cl(ovr+(age<25?ri(0,15):ri(0,2)),ovr,99),
-    sal:Math.max(.8,+(P.cap*Math.pow(ovr/99,3.2)).toFixed(1)),yrs:rookie?4:ri(1,5),rookie,bench,morale:ri(55,100),cond:ri(85,100),xp:0,gp:0,stats:{},face:[ri(0,5),ri(0,4),ri(0,3),rnd()<.35?1:0]};
+    sal:Math.max(.8,+(P.cap*Math.pow(ovr/99,3.2)).toFixed(1)),yrs:rookie?4:ri(1,5),rookie,bench,slot:null,rested:false,morale:ri(55,100),cond:ri(85,100),xp:0,gp:0,stats:{},vis:[ovr,cl(Math.round(mean+SPD[pos]+gauss()*9),25,99),cl(Math.round(mean+STR[pos]+gauss()*9),25,99),cl(Math.round(mean+gauss()*9),25,99)],face:[ri(0,5),ri(0,4),ri(0,3),rnd()<.35?1:0]};
 }
 function makeRoster(){const str=ri(56,74),used=new Set(),pl=[];
-  for(const[pos,n]of LAYOUT)for(let i=0;i<n;i++)pl.push(makePlayer(pos,str-i*2,false,used));
+  for(const[pos,n]of LAYOUT)for(let i=0;i<n;i++){const p=makePlayer(pos,str-i*2,false,used);p.slot=i;pl.push(p)}
   for(const pos of [...BENCH_O,...BENCH_D])pl.push(makePlayer(pos,str-14,true,used));return pl}
 function newCareer(team){const league={};TEAMS.forEach(t=>league[t.id]=makeRoster());
   const picks=[];for(const t of TEAMS)for(let y=2027;y<=2029;y++)for(let rd=1;rd<=7;rd++)picks.push({y,rd,own:t.id,orig:t.id});
-  return{v:3,created:Date.now(),team,year:2026,week:1,fans:60,morale:80,league,picks,log:[]}}
+  return{v:4,created:Date.now(),team,year:2026,week:1,fans:60,morale:80,league,picks,log:[]}}
 // storage (IndexedDB) + export/import
 const DB=()=>new Promise((ok,no)=>{const r=indexedDB.open("retro-gridiron",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
 const kv=async(m,f)=>{const d=await DB();return new Promise((ok,no)=>{const t=d.transaction("kv",m);const q=f(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)})};
@@ -135,10 +145,11 @@ const teamStars=(ps,sd)=>{const a=ps.filter(p=>!p.bench&&POS[p.pos].side==sd);re
 const capUsed=ps=>ps.reduce((s,p)=>s+p.sal,0);
 const face=(f,t)=>{const[s,h,st,bd]=f,sk=SKIN[s],hc=HAIR[h],R=(x,y,w,hh,c)=>`<rect x="${x}" y="${y}" width="${w}" height="${hh}" fill="${c}"/>`;
   return`<svg viewBox="0 0 16 16" shape-rendering="crispEdges">${R(2,12,12,4,t.c1)}${R(2,12,12,1,t.c2)}${R(6,10,4,2,sk)}${R(4,3,8,7,sk)}${st==1?"":st==2?R(3,1,10,3,hc)+R(3,3,1,3,hc)+R(12,3,1,3,hc):R(4,2,8,2,hc)+(st==3?R(4,4,1,2,hc)+R(11,4,1,2,hc):"")}${bd?R(4,8,8,2,hc)+R(7,8,2,1,sk):R(7,8,2,1,"#8a3b3b")}${R(6,6,1,1,"#111")}${R(9,6,1,1,"#111")}</svg>`};
-const card=(p,t)=>`<div class="card" data-a="player" data-id="${p.id}"><div class="pic" style="background-color:${HEAD[POS[p.pos].side]}"><b>${p.pos}</b><u>#${p.num}</u><i class="face ${p.morale>80?"":p.morale>60?"mid":"lo"}"></i><div class="fc">${face(p.face,t)}</div></div><div class="n"><div class="nm">${p.name.split(" ")[1]}</div><div class="stars">${stars(bars(p))}</div></div><div class="bar g"><i style="width:${p.cond}%"></i></div></div>`;
-const filler=pos=>`<div class="card x"><div class="pic" style="background-color:#666"><b>${pos}</b></div><div class="n"><div class="nm">Filler</div><div class="stars">${stars(2)}</div></div></div>`;
+const lab=p=>p.pos+(!p.bench&&SLOTS[p.pos]>1?p.slot+1:""),mcls=m=>m>80?"hi":m>60?"mid":"lo";
+const card=(p,t)=>`<div class="card ${p.bench?"bn":""}" data-a="player" data-id="${p.id}"><div class="pic" style="background-color:${HEAD[POS[p.pos].side]}"><b>${lab(p)}</b><u>#${p.num}</u>${p.rested?'<s class="tag">REST</s>':""}<i class="face ${mcls(p.morale)}"></i><div class="fc">${face(p.face,t)}</div></div><div class="n"><div class="nm">${p.name.split(" ")[1]}</div><div class="stars">${stars(bars(p))}</div></div><div class="bar g"><i style="width:${p.cond}%"></i></div></div>`;
+const filler=(pos,i)=>`<div class="card x"><div class="pic" style="background-color:#666"><b>${pos}${SLOTS[pos]>1?i+1:""}</b></div><div class="n"><div class="nm">Filler</div><div class="stars">${stars(2)}</div></div></div>`;
 const emptyC=()=>`<div class="card x"><div class="pic" style="background-color:#0000"></div><div class="n"><div class="nm">Empty</div><div class="stars">&nbsp;</div></div></div>`;
-function slotsFor(ps,sd,t){const out=[];for(const[pos,n]of LAYOUT){if(POS[pos].side!=sd)continue;const a=ps.filter(p=>p.pos==pos&&!p.bench).sort((x,y)=>y.shown-x.shown);for(let i=0;i<n;i++)out.push(a[i]?card(a[i],t):filler(pos))}return out}
+function slotsFor(ps,sd,t){const out=[];for(const[pos,n]of LAYOUT){if(POS[pos].side!=sd)continue;for(let i=0;i<n;i++){const p=ps.find(x=>x.pos==pos&&!x.bench&&x.slot===i);out.push(p?card(p,t):filler(pos,i))}}return out}
 // views
 const V={
 title(){const sl=S.slots.map((s,i)=>s?`<div class="row"><button class="btn sp" data-a="load" data-i="${i}">${plate(T(s.team))} Year ${s.year-2025}, Week ${s.week}</button><button class="btn" data-a="exp" data-i="${i}">Export</button><button class="btn" data-a="del" data-i="${i}">X</button></div>`:`<div class="row"><button class="btn sp" data-a="new" data-i="${i}">Slot ${i+1}: new career</button><button class="btn" data-a="imp" data-i="${i}">Import</button></div>`).join("");
@@ -152,20 +163,21 @@ home(){const c=S.career,t=T(c.team),ps=c.league[t.id],opp=TEAMS.filter(x=>x.div=
 <div class="row grow" style="align-items:stretch;flex-wrap:nowrap"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:10px"><span>Morale ${c.morale}%</span></div><div class="row" style="margin-top:6px"><span>OFF ${stars(teamStars(ps,"O"))}</span><span class="sp"></span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
 <div class="row"><button class="btn" data-a="opts" data-from="home">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div></div>`},
 kick(ps,t){return`<div class="page kick">`+ps.filter(p=>POS[p.pos].side=="K").map(p=>{const off=S.set.reveal?0:p.shown-p.ovr,st=p.pos=="K"?"FG 0/0 | Long 0":"Punts 0 | Avg 0";
-  return`<div class="kp"><div class="kc">${card(p,t)}</div><div class="sp"><div style="font-size:14px">${p.pos=="K"?"Kicker":"Punter"}: ${p.name}</div><div class="dim">#${p.num} | Age ${p.age} | $${p.sal}M (${p.yrs}y)</div><div style="margin:4px 0">${st}</div>${POS[p.pos].a.map((a,i)=>`<div>${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}</div></div>`}).join("")+`</div>`},
+  return`<div class="kp"><div class="kc">${card(p,t)}</div><div class="sp"><div style="font-size:14px">${p.pos=="K"?"Kicker":"Punter"}: ${p.name}</div><div class="dim">#${p.num} | Age ${p.age} | $${p.sal}M (${p.yrs}y)</div><div style="margin:4px 0">${st}</div>${[SK[p.pos],"Speed","Strength","Stamina"].map((a,i)=>`<div>${a}<div class="bar"><i style="width:${cl(p.vis[i]+off,1,99)}%"></i></div></div>`).join("")}</div></div>`}).join("")+`</div>`},
 roster(){const c=S.career,t=T(c.team),ps=c.league[t.id],sd=S.tab==0?"O":"D";let pages,bc=0;
-  if(S.tab==2)pages=[V.kick(ps,t)];else{const bn=ps.filter(p=>p.bench&&POS[p.pos].side==sd);bc=bn.length;const b=bn.map(p=>card(p,t));while(b.length<12)b.push(emptyC());pages=[`<div class="page grid">${slotsFor(ps,sd,t).join("")}</div>`,`<div class="page grid">${b.join("")}</div>`]}
-  const dots=S.tab==2?"":`<span class="pgl"><span id="pgl">${S.pg?"Bench":"Starters"}</span> <i class="dot ${S.pg?"":"on"}"></i><i class="dot ${S.pg?"on":""}"></i></span>`;
+  if(S.tab==2)pages=[V.kick(ps,t)];else{const bn=ps.filter(p=>p.bench&&POS[p.pos].side==sd).sort((a,b)=>(b.rested?1:0)-(a.rested?1:0)||PO.indexOf(a.pos)-PO.indexOf(b.pos));bc=bn.length;const b=bn.map(p=>card(p,t));while(b.length<12)b.push(emptyC());pages=[`<div class="page grid">${slotsFor(ps,sd,t).join("")}</div>`,`<div class="page grid">${b.join("")}</div>`]}
+  const dots=S.tab==2?"":`<span class="pgl"><span id="pgl">${S.pg?"Bench (gold REST = rested starter)":"Starters"}</span> <i class="dot ${S.pg?"":"on"}"></i><i class="dot ${S.pg?"on":""}"></i></span>`;
   return`<div class="row" style="margin-bottom:6px"><button class="btn" data-a="go" data-v="home">Home</button>${["Offense","Defense","Kicking"].map((n,i)=>`<button class="btn tb ${S.tab==i?"on":""}" data-a="tab" data-t="${i}">${n}</button>`).join("")}<span class="sp"></span>${dots}<span style="margin-left:10px">Cap ${capUsed(ps).toFixed(0)}M/280M</span></div><div class="pages" id="pg">${pages.join("")}</div>`},
 opts(){const o=S.set,b=(k,v,l)=>`<button class="btn ${o[k]==v?"on":""}" data-a="set" data-k="${k}" data-v="${v}">${l}</button>`;
   return banner("OPTIONS")+(S.optFrom=="home"?`<div class="box"><h3>LOOK</h3><div class="row"><span>Menu colours</span>${b("theme","slate","Slate")}${b("theme","team","Team colours")}</div></div>`:"")+`<div class="box"><h3>GAME</h3><div class="row"><span>Get sacked</span>${b("sack",true,"On")}${b("sack",false,"Off")}</div><div class="row"><span>Quarters</span>${[1,2,3,4,5].map(m=>b("qmins",m,m+"m")).join("")}</div><div class="row"><span>True ratings</span>${b("reveal",false,"Hidden")}${b("reveal",true,"Revealed")}</div></div><button class="btn" data-a="go" data-v="${S.optFrom}">Back</button>`}
 };
 function render(){theme();$("#app").innerHTML=V[S.view]();const pg=$("#pg");
-  if(pg){pg.scrollLeft=S.pg*pg.clientWidth;pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!=S.pg){S.pg=i;document.querySelectorAll(".dot").forEach((d,j)=>d.classList.toggle("on",j==i));const l=$("#pgl");if(l)l.textContent=i?"Bench":"Starters"}}}}
-function player(id){const ps=S.career.league[S.career.team],p=ps.find(x=>x.id==id),P=POS[p.pos],off=S.set.reveal?0:p.shown-p.ovr,kk=P.side=="K";
+  if(pg){pg.scrollLeft=S.pg*pg.clientWidth;pg.onscroll=()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!=S.pg){S.pg=i;document.querySelectorAll(".dot").forEach((d,j)=>d.classList.toggle("on",j==i));const l=$("#pgl");if(l)l.textContent=i?"Bench (gold REST = rested starter)":"Starters"}}}}
+function player(id){const ps=S.career.league[S.career.team],p=ps.find(x=>x.id==id),P=POS[p.pos],off=S.set.reveal?0:p.shown-p.ovr,kk=P.side=="K",ml=p.morale>80?"Happy":p.morale>60?"Okay":"Unhappy";
   const mates=kk?[]:ps.filter(x=>x.pos==p.pos&&x.bench!=p.bench),free=p.bench&&ps.filter(x=>x.pos==p.pos&&!x.bench).length<SLOTS[p.pos];
   const act=kk?"":(free?`<button class="btn" data-a="flip" data-id="${p.id}">Start</button>`:"")+(!p.bench?`<button class="btn" data-a="flip" data-id="${p.id}">Rest (bench)</button>`:"")+mates.map(m=>`<button class="btn" data-a="swap" data-id="${p.id}" data-b="${m.id}">Swap: ${m.name.split(" ")[1]} ${stars(bars(m))}</button>`).join("");
-  const m=document.createElement("div");m.className="mod";m.innerHTML=`<div><h2 style="margin:0 0 6px;font-size:16px">${p.pos} #${p.num} ${p.name}</h2><div>Age ${p.age} | $${p.sal}M (${p.yrs}y) | Morale ${p.morale}%${p.rookie?" | Rookie":""}${p.bench?" | Bench":""}</div><div style="margin:6px 0">Rating ${stars(bars(p))}${S.set.reveal?` <span class="dim">(true ${p.ovr})</span>`:""}</div>${P.a.map((a,i)=>`<div style="margin-top:5px">${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}<div class="row" style="margin-top:10px">${act}<button class="btn" data-a="close">Close</button></div></div>`;document.body.appendChild(m)}
+  const vb=(n,v)=>`<div style="margin-top:5px">${n}<div class="bar"><i style="width:${cl(v+off,1,99)}%"></i></div></div>`;
+  const m=document.createElement("div");m.className="mod";m.innerHTML=`<div><h2 style="margin:0 0 6px;font-size:16px">${lab(p)} #${p.num} ${p.name}</h2><div>Age ${p.age} | $${p.sal}M (${p.yrs}y)${p.rookie?" | Rookie":""}${p.bench?(p.rested?" | Resting":" | Backup"):""}</div><div style="margin:6px 0">Morale <i class="face ${mcls(p.morale)}"></i> ${ml} &nbsp; Rating ${stars(bars(p))}${S.set.reveal?` <span class="dim">(true ${p.ovr})</span>`:""}</div>${vb(SK[p.pos],p.vis[0])}${["Speed","Strength","Stamina"].map((n,i)=>vb(n,p.vis[i+1])).join("")}${S.set.reveal?`<div class="dim" style="margin-top:8px">Behind the scenes</div>`+P.a.map((a,i)=>`<div>${a}: ${p.attrs[i]}</div>`).join(""):""}<div class="row" style="margin-top:10px">${act}<button class="btn" data-a="close">Close</button></div></div>`;document.body.appendChild(m)}
 async function changed(){document.querySelector(".mod")?.remove();await save();render()}
 document.addEventListener("click",async e=>{
   const b=e.target.closest("[data-a]");if(!b)return;const d=b.dataset,a=d.a,ps=S.career&&S.career.league[S.career.team];
@@ -174,7 +186,7 @@ document.addEventListener("click",async e=>{
   else if(a=="soon")toast(d.m);
   else if(a=="new"){S.slot=+d.i;S.view="teams";render()}
   else if(a=="pick"){S.career=newCareer(d.id);S.view="home";await save();S.slots[S.slot]={team:d.id,year:2026,week:1};render()}
-  else if(a=="load"){S.slot=+d.i;let c=await dbGet("slot"+d.i);if(c.v<3){c=newCareer(c.team);toast("Old save upgraded to the new roster layout")}S.career=c;S.view="home";await save();render()}
+  else if(a=="load"){S.slot=+d.i;let c=await dbGet("slot"+d.i);if(c.v<4){c=newCareer(c.team);toast("Old save upgraded to the new roster layout")}S.career=c;S.view="home";await save();render()}
   else if(a=="del"){if(confirm("Delete this career? Export it first if you want a backup.")){await dbDel("slot"+d.i);S.slots[+d.i]=null;render()}}
   else if(a=="exp"){const c=await dbGet("slot"+d.i),u=URL.createObjectURL(new Blob([JSON.stringify(c)],{type:"application/json"})),l=document.createElement("a");l.href=u;l.download="retro-gridiron-slot"+(+d.i+1)+".json";l.click();setTimeout(()=>URL.revokeObjectURL(u),3e3)}
   else if(a=="imp"){const f=$("#file");f.onchange=async()=>{try{const c=JSON.parse(await f.files[0].text());if(!c.league)throw 0;await dbPut("slot"+d.i,c);S.slots[+d.i]={team:c.team,year:c.year,week:c.week};render();toast("Imported")}catch(x){toast("That file is not a valid save")}};f.click()}
@@ -182,8 +194,8 @@ document.addEventListener("click",async e=>{
   else if(a=="set"){S.set[d.k]=d.v=="true"?true:d.v=="false"?false:isNaN(d.v)?d.v:+d.v;await save();render()}
   else if(a=="player")player(d.id);
   else if(a=="close")document.querySelector(".mod").remove();
-  else if(a=="flip"){const p=ps.find(x=>x.id==d.id);if(!p.bench&&ps.filter(x=>x.bench&&POS[x.pos].side==POS[p.pos].side).length>=12)return toast("Bench is full (12 spots)");p.bench=!p.bench;changed()}
-  else if(a=="swap"){const p=ps.find(x=>x.id==d.id),q=ps.find(x=>x.id==d.b);[p.bench,q.bench]=[q.bench,p.bench];changed()}
+  else if(a=="flip"){const p=ps.find(x=>x.id==d.id);if(!p.bench&&ps.filter(x=>x.bench&&POS[x.pos].side==POS[p.pos].side).length>=12)return toast("Bench is full (12 spots)");if(p.bench){const P2=ps.filter(x=>x.pos==p.pos&&!x.bench).map(x=>x.slot);p.slot=[...Array(SLOTS[p.pos]).keys()].find(k=>!P2.includes(k));p.bench=false;p.rested=false}else{p.bench=true;p.rested=true;p.slot=null}changed()}
+  else if(a=="swap"){const p=ps.find(x=>x.id==d.id),q=ps.find(x=>x.id==d.b);const[a1,b1]=p.bench?[q,p]:[p,q];b1.slot=a1.slot;a1.slot=null;a1.bench=true;a1.rested=true;b1.bench=false;b1.rested=false;changed()}
 });
 loadAll().then(render);render();
 if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
