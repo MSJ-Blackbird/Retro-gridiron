@@ -1,0 +1,172 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#1c2740">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon-180.png">
+<title>Retro Gridiron</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+:root{--bg:#1c2740;--bg2:#2c3d63;--acc:#f2d216}
+body{font:700 15px/1.3 "Courier New",ui-monospace,monospace;color:#fff;letter-spacing:.5px;background:linear-gradient(160deg,var(--bg2),var(--bg)) fixed;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0;opacity:.06;pointer-events:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='56'%3E%3Cpath d='M28 8l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z' fill='white'/%3E%3C/svg%3E")}
+#app{position:relative;max-width:980px;margin:0 auto;padding:14px}
+#rot{display:none;text-align:center;font-size:12px;opacity:.7;padding:4px}
+@media(orientation:portrait){#rot{display:block}}
+.ttl{text-align:center;font-size:24px;margin:6px 0 14px;text-shadow:0 3px 0 #0007}.ttl small{display:block;font-size:13px;opacity:.75}
+.s{color:#fff}.s.r{color:#c8344a}.s.n{color:#3b4d9a}
+.box{border:3px solid #fff;border-radius:8px;padding:12px;margin:10px 0;position:relative}
+.box>h3{position:absolute;top:-11px;left:12px;margin:0;padding:0 6px;font-size:13px;background:var(--bg)}
+.btn{display:inline-block;border:3px solid #fff;border-radius:8px;padding:11px 14px;margin:4px;background:transparent;color:#fff;font:inherit;box-shadow:0 4px 0 #0007;cursor:pointer;text-align:center}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #0007}
+.btn.on{background:var(--acc);color:#10182a;border-color:var(--acc)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.sp{flex:1}.dim{opacity:.6}
+.plate{display:inline-flex;align-items:center;justify-content:center;border:3px solid;border-radius:6px;min-width:64px;height:48px;font-size:18px;text-shadow:0 2px 0 #0006}
+.plate.l{min-width:92px;height:64px;font-size:26px}
+.bar{height:14px;background:#000;border-radius:3px;overflow:hidden}.bar>i{display:block;height:100%;background:var(--acc)}.bar.g>i{background:#1fd01f}
+.st{display:inline-block;font-size:17px;background:linear-gradient(90deg,var(--acc) var(--p),#46526e var(--p));-webkit-background-clip:text;background-clip:text;color:transparent}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.card{border:3px solid #fff;border-radius:6px;overflow:hidden;background:#3b4560;cursor:pointer}
+.card .h{display:flex;justify-content:space-between;padding:5px 7px;font-size:13px;color:#fff;text-shadow:0 1px 0 #0006}
+.card .n{padding:4px 7px;background:#4a5167}.card .n b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.face{display:inline-block;width:16px;height:16px;border-radius:50%;background:var(--acc);color:#10182a;font-size:11px;line-height:16px;text-align:center}
+.mod{position:fixed;inset:0;background:#000b;display:flex;align-items:center;justify-content:center;padding:14px;z-index:5}
+.mod>div{background:var(--bg);border:3px solid #fff;border-radius:10px;padding:16px;max-width:520px;width:100%;max-height:90vh;overflow:auto}
+#toast{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);background:#000c;border:2px solid #fff;border-radius:8px;padding:8px 14px;display:none;z-index:9}
+</style></head><body><div id="rot">Rotate to landscape for the best fit</div><div id="app"></div><div id="toast"></div>
+<script>
+// ---------- DATA: 32 teams (id|city|name|primary|secondary|conf+div) ----------
+const TEAMS=`ARI|Arizona|Cardinals|97233F|FFB612|NW
+ATL|Atlanta|Falcons|A71930|111111|NS
+BAL|Baltimore|Ravens|241773|9E7C0C|AN
+BUF|Buffalo|Bills|00338D|C60C30|AE
+CAR|Carolina|Panthers|0085CA|101820|NS
+CHI|Chicago|Bears|0B162A|C83803|NN
+CIN|Cincinnati|Bengals|FB4F14|111111|AN
+CLE|Cleveland|Browns|311D00|FF3C00|AN
+DAL|Dallas|Cowboys|003594|869397|NE
+DEN|Denver|Broncos|FB4F14|002244|AW
+DET|Detroit|Lions|0076B6|B0B7BC|NN
+GB|Green Bay|Packers|203731|FFB612|NN
+HOU|Houston|Texans|03202F|A71930|AS
+IND|Indianapolis|Colts|002C5F|A2AAAD|AS
+JAX|Jacksonville|Jaguars|006778|D7A22A|AS
+KC|Kansas City|Chiefs|E31837|FFB81C|AW
+LV|Las Vegas|Raiders|111111|A5ACAF|AW
+LAC|Los Angeles|Chargers|0080C6|FFC20E|AW
+LAR|Los Angeles|Rams|003594|FFA300|NW
+MIA|Miami|Dolphins|008E97|FC4C02|AE
+MIN|Minnesota|Vikings|4F2683|FFC62F|NN
+NE|New England|Patriots|002244|C60C30|AE
+NO|New Orleans|Saints|D3BC8D|101820|NS
+NYG|New York|Giants|0B2265|A71930|NE
+NYJ|New York|Jets|125740|111111|AE
+PHI|Philadelphia|Eagles|004C54|A5ACAF|NE
+PIT|Pittsburgh|Steelers|FFB612|101820|AN
+SF|San Francisco|49ers|AA0000|B3995D|NW
+SEA|Seattle|Seahawks|002244|69BE28|NW
+TB|Tampa Bay|Buccaneers|D50A0A|FF7900|NS
+TEN|Tennessee|Titans|0C2340|4B92DB|AS
+WAS|Washington|Commanders|5A1414|FFB612|NE`.split("\n").map(l=>{const[id,city,name,a,b,d]=l.split("|");return{id,city,name,c1:"#"+a,c2:"#"+b,conf:d[0]=="A"?"AFC":"NFC",div:{E:"East",N:"North",S:"South",W:"West"}[d[1]]}});
+const T=id=>TEAMS.find(t=>t.id==id);
+// roster: 13 offensive pool + 12 defense + K/P + 6 bench = 33
+const LAYOUT=[["QB",1],["RB",2],["WR",3],["TE",2],["OL",5],["DL",4],["LB",3],["CB",3],["S",2],["K",1],["P",1]];
+const BENCH=["QB","OL","DL","LB","CB","S"];
+const POS={QB:{a:["Accuracy","Arm","Awareness","Mobility"],n:[1,19],cap:55,side:"O"},RB:{a:["Speed","Elusiveness","Power","Hands"],n:[20,39],cap:14,side:"O"},WR:{a:["Speed","Hands","Routes","Contested"],n:[10,19],cap:35,side:"O"},TE:{a:["Hands","Blocking","Routes","Speed"],n:[80,89],cap:16,side:"O"},OL:{a:["Pass block","Run block","Strength","Awareness"],n:[60,79],cap:25,side:"O"},DL:{a:["Pass rush","Run stop","Strength","Speed"],n:[90,99],cap:32,side:"D"},LB:{a:["Tackling","Coverage","Run stop","Speed"],n:[50,59],cap:22,side:"D"},CB:{a:["Coverage","Speed","Ball skills","Tackling"],n:[20,39],cap:28,side:"D"},S:{a:["Coverage","Tackling","Ball skills","Range"],n:[20,39],cap:18,side:"D"},K:{a:["Power","Accuracy","Clutch","Kickoffs"],n:[1,19],cap:6,side:"K"},P:{a:["Power","Accuracy","Hang time","Directional"],n:[1,19],cap:4,side:"K"}};
+const FN="Jalen Marcus Devin Tyrell Caleb Isaiah Brandon Cole Dante Eli Jordan Kyle Malik Noah Owen Reggie Trey Wes Zach Andre".split(" ");
+const LN="Hayes Brooks Carter Dixon Ellis Foster Grant Hudson Irving Jenkins Knox Lawson Mills Nash Odom Pratt Quinn Reeds Sutton Tate Vance Walker Young".split(" ");
+// ---------- helpers ----------
+let seed=Date.now()>>>0;const rnd=()=>{seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296};
+const ri=(a,b)=>a+Math.floor(rnd()*(b-a+1)),cl=(v,a,b)=>Math.max(a,Math.min(b,v)),pick=a=>a[ri(0,a.length-1)];
+const gauss=()=>(rnd()+rnd()+rnd()-1.5)*1.6;
+const hex=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
+const lum=h=>{const[r,g,b]=hex(h);return(.299*r+.587*g+.114*b)/255};
+const mix=(a,b,t)=>{const A=hex(a),B=hex(b);return"#"+A.map((v,i)=>Math.round(v+(B[i]-v)*t).toString(16).padStart(2,"0")).join("")};
+// ---------- player + team generation ----------
+function makePlayer(pos,mean,bench,used){
+  const P=POS[pos];let num;do{num=ri(P.n[0],P.n[1])}while(used.has(num));used.add(num);
+  const age=ri(21,35),rookie=age<=22&&rnd()<.5;
+  const attrs=P.a.map(()=>cl(Math.round(mean+gauss()*9),25,99));
+  const ovr=Math.round(attrs.reduce((a,b)=>a+b,0)/4);
+  const shown=cl(Math.round(ovr+gauss()*(rookie?6:2)),20,99); // hidden vs shown rating
+  return{id:"p"+Math.floor(rnd()*1e9),name:pick(FN)+" "+pick(LN),pos,num,age,attrs,ovr,shown,pot:cl(ovr+(age<25?ri(0,15):ri(0,2)),ovr,99),
+    sal:Math.max(.8,+(P.cap*Math.pow(ovr/99,3.2)).toFixed(1)),yrs:rookie?4:ri(1,5),rookie,bench,morale:ri(60,100),cond:ri(85,100),xp:0,gp:0,stats:{}};
+}
+function makeRoster(){
+  const str=ri(56,74),used=new Set(),pl=[];
+  for(const[pos,n]of LAYOUT)for(let i=0;i<n;i++)pl.push(makePlayer(pos,str-i*2,false,used));
+  for(const pos of BENCH)pl.push(makePlayer(pos,str-14,true,used));
+  return pl;
+}
+function newCareer(team,real){
+  const league={};TEAMS.forEach(t=>league[t.id]=makeRoster());
+  const picks=[];for(const t of TEAMS)for(let y=2027;y<=2029;y++)for(let rd=1;rd<=7;rd++)picks.push({y,rd,own:t.id,orig:t.id});
+  return{v:1,created:Date.now(),team,real:!!real,year:2026,week:1,fans:60,morale:80,league,picks,log:[]};
+}
+// ---------- storage (IndexedDB; Export/Import for backups) ----------
+const DB=()=>new Promise((ok,no)=>{const r=indexedDB.open("retro-gridiron",1);r.onupgradeneeded=()=>r.result.createObjectStore("kv");r.onsuccess=()=>ok(r.result);r.onerror=()=>no(r.error)});
+const kv=async(m,f)=>{const d=await DB();return new Promise((ok,no)=>{const t=d.transaction("kv",m);const q=f(t.objectStore("kv"));t.oncomplete=()=>ok(q&&q.result);t.onerror=()=>no(t.error)})};
+const dbGet=k=>kv("readonly",s=>s.get(k)),dbPut=(k,v)=>kv("readwrite",s=>s.put(v,k)),dbDel=k=>kv("readwrite",s=>s.delete(k));
+// ---------- state ----------
+const S={view:"title",set:{theme:"slate",sack:true,reveal:false,qmins:2},slot:null,career:null,tab:"O",slots:[null,null,null]};
+const $=s=>document.querySelector(s),toast=m=>{const t=$("#toast");t.textContent=m;t.style.display="block";clearTimeout(toast.t);toast.t=setTimeout(()=>t.style.display="none",2200)};
+async function save(){try{if(S.slot!=null&&S.career)await dbPut("slot"+S.slot,S.career);await dbPut("settings",S.set)}catch(e){toast("Could not save: storage unavailable")}}
+async function loadAll(){try{S.set={...S.set,...(await dbGet("settings")||{})};for(let i=0;i<3;i++){const c=await dbGet("slot"+i);S.slots[i]=c?{team:c.team,year:c.year,week:c.week}:null}}catch(e){}}
+function theme(){
+  const r=document.documentElement.style,t=S.career&&T(S.career.team);let bg="#1c2740",bg2="#2c3d63",acc="#f2d216";
+  if(t){const a=lum(t.c2)>.2?t.c2:lum(t.c1)>.2?t.c1:acc;
+    if(S.set.theme=="team"){const k=lum(t.c1)>.15?.6:.1;bg=mix(mix(t.c1,"#0b1020",k),"#1c2740",.25);bg2=mix(mix(t.c1,"#0b1020",k*.5),"#2c3d63",.25);acc=a}else acc=a}
+  r.setProperty("--bg",bg);r.setProperty("--bg2",bg2);r.setProperty("--acc",acc);
+}
+// ---------- UI pieces ----------
+const plate=(t,l)=>`<span class="plate ${l?"l":""}" style="background:${t.c1};color:${t.c2};border-color:${t.c2}">${t.id}</span>`;
+const banner=(x,sub)=>`<div class="ttl"><span class="s r">★</span><span class="s">★</span><span class="s n">★</span> ${x} <span class="s n">★</span><span class="s">★</span><span class="s r">★</span>${sub?`<small>${sub}</small>`:""}</div>`;
+const stars=b=>{let o="";for(let i=0;i<5;i++)o+=`<span class="st" style="--p:${cl((b-i*2)/2,0,1)*100}%">★</span>`;return o};
+const bars=p=>cl(Math.round(p.shown/10),1,10);
+const side=ps=>{const a=ps.filter(p=>!p.bench);return a.length?a:ps};
+const teamStars=(ps,sd)=>{const a=ps.filter(p=>!p.bench&&POS[p.pos].side==sd);return Math.round(a.reduce((s,p)=>s+bars(p),0)/a.length)};
+const HEAD={O:"#4f8fc7",D:"#c0503f",K:"#d9792b"};
+const card=p=>`<div class="card" data-a="player" data-id="${p.id}"><div class="h" style="background:${HEAD[POS[p.pos].side]}"><span>${p.pos} #${p.num}</span><span class="face">${p.morale>75?"☺":"-"}</span></div><div class="n"><b>${p.name.split(" ")[1]}</b>${stars(bars(p))}<div class="bar g" style="margin-top:4px"><i style="width:${p.cond}%"></i></div></div></div>`;
+function capUsed(ps){return ps.reduce((s,p)=>s+p.sal,0)}
+// ---------- views ----------
+const V={
+title(){const sl=S.slots.map((s,i)=>s?`<div class="row"><button class="btn sp" data-a="load" data-i="${i}">${plate(T(s.team))} Year ${s.year-2025}, Week ${s.week}</button><button class="btn" data-a="exp" data-i="${i}">Export</button><button class="btn" data-a="del" data-i="${i}">X</button></div>`:`<div class="row"><button class="btn sp" data-a="new" data-i="${i}">Slot ${i+1}: new career</button><button class="btn" data-a="imp" data-i="${i}">Import</button></div>`).join("");
+  return banner("RETRO GRIDIRON","Phase 1 skeleton")+`<div class="box"><h3>CAREERS</h3>${sl}</div><div class="row"><button class="btn" data-a="go" data-v="opts">Options</button></div><input id="file" type="file" accept=".json" hidden>`},
+teams(){const g=c=>TEAMS.filter(t=>t.conf==c).map(t=>`<button class="btn" data-a="pick" data-id="${t.id}">${plate(t)}<div style="font-size:12px;margin-top:4px">${t.name}</div></button>`).join("");
+  return banner("CHOOSE YOUR TEAM")+`<div class="row"><span>League players:</span><button class="btn on">Fictional</button><button class="btn dim" data-a="soon" data-m="Real players arrive in the data phase">Real</button></div><div class="box"><h3>AFC</h3><div class="row">${g("AFC")}</div></div><div class="box"><h3>NFC</h3><div class="row">${g("NFC")}</div></div><button class="btn" data-a="go" data-v="title">Back</button>`},
+home(){const c=S.career,t=T(c.team),ps=c.league[t.id],opp=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf&&x.id!=t.id),o=opp[(c.week-1)%opp.length],o2=opp[c.week%opp.length];
+  const div=TEAMS.filter(x=>x.div==t.div&&x.conf==t.conf).map(x=>`<div class="row"><span class="sp" style="${x.id==t.id?"color:var(--acc)":""}">${x.name}</span><span>0-0-0</span></div>`).join("");
+  return banner("YEAR "+(c.year-2025),`${t.city} ${t.name}`)+`<div class="box"><h3>SCHEDULE</h3><div class="row" style="justify-content:space-around;text-align:center"><div>${plate(o,1)}<br>Week ${c.week} vs ${o.id}</div><div>${plate(o2,1)}<br>Week ${c.week+1} at ${o2.id}</div></div></div>
+<div class="row" style="align-items:stretch"><div class="box sp"><h3>${t.conf} ${t.div.toUpperCase()}</h3>${div}</div><div class="box sp"><h3>FANS ${c.fans}%</h3><div class="bar"><i style="width:${c.fans}%"></i></div><div class="row" style="margin-top:10px"><span>Morale ${c.morale}%</span><span class="sp"></span><span>OFF ${stars(teamStars(ps,"O"))}</span><span>DEF ${stars(teamStars(ps,"D"))}</span></div></div></div>
+<div class="row"><button class="btn" data-a="go" data-v="opts">Options</button><span class="sp"></span><button class="btn" data-a="soon" data-m="Front office: phase 5">Front Office</button><button class="btn" data-a="go" data-v="roster">Roster</button><button class="btn" data-a="soon" data-m="Hall of Fame: phase 6">Hall of Fame</button><button class="btn" data-a="soon" data-m="Playable games: phase 2">Continue</button><button class="btn" data-a="go" data-v="title">Menu</button></div>`},
+roster(){const c=S.career,ps=c.league[c.team],tb={O:"Offense",D:"Defense",K:"Kicking",B:"Bench"},list=ps.filter(p=>S.tab=="B"?p.bench:!p.bench&&POS[p.pos].side==S.tab);
+  const cap=capUsed(ps);
+  return banner("ROSTER",`${ps.length} players`)+`<div class="row">${Object.keys(tb).map(k=>`<button class="btn ${S.tab==k?"on":""}" data-a="tab" data-t="${k}">${tb[k]}</button>`).join("")}</div><div class="grid" style="margin-top:8px">${list.map(card).join("")}</div>
+<div class="box"><h3>SALARY CAP ${cap.toFixed(0)}M / 280M</h3><div class="bar"><i style="width:${Math.min(100,cap/2.8)}%"></i></div></div><button class="btn" data-a="go" data-v="home">Home</button>`},
+opts(){const o=S.set,b=(k,v,l)=>`<button class="btn ${o[k]==v?"on":""}" data-a="set" data-k="${k}" data-v="${v}">${l}</button>`;
+  return banner("OPTIONS")+`<div class="box"><h3>LOOK</h3><div class="row"><span>Menu colours</span>${b("theme","slate","Slate + team accent")}${b("theme","team","Team colours")}</div></div>
+<div class="box"><h3>GAME</h3><div class="row"><span>Get sacked</span>${b("sack",true,"On")}${b("sack",false,"Off")}</div><div class="row"><span>Quarters</span>${[1,2,3,4,5].map(m=>b("qmins",m,m+"m")).join("")}</div><div class="row"><span>True ratings</span>${b("reveal",false,"Hidden")}${b("reveal",true,"Revealed")}</div></div>
+<div class="box"><h3>INSTALL</h3><div class="dim">Safari: Share, then Add to Home Screen. After the first load the game works offline.</div></div><button class="btn" data-a="go" data-v="${S.career?"home":"title"}">Back</button>`}
+};
+function render(){theme();$("#app").innerHTML=V[S.view]()}
+// ---------- actions ----------
+function player(id){const p=S.career.league[S.career.team].find(x=>x.id==id),off=S.set.reveal?0:p.shown-p.ovr,P=POS[p.pos];
+  const m=document.createElement("div");m.className="mod";m.innerHTML=`<div><h2 style="margin:0 0 8px">${p.pos} #${p.num} ${p.name}</h2><div>Age ${p.age} | $${p.sal}M (${p.yrs}y) | Morale ${p.morale}%${p.rookie?" | Rookie":""}</div><div style="margin:8px 0">Rating ${stars(bars(p))}${S.set.reveal?` <span class="dim">(true ${p.ovr})</span>`:""}</div>${P.a.map((a,i)=>`<div style="margin-top:6px">${a}<div class="bar"><i style="width:${cl(p.attrs[i]+off,1,99)}%"></i></div></div>`).join("")}<button class="btn" style="margin-top:12px" data-a="close">Close</button></div>`;document.body.appendChild(m)}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("[data-a]");if(!b)return;const d=b.dataset,a=d.a;
+  if(a=="go"){S.view=d.v;render()}
+  else if(a=="soon")toast(d.m);
+  else if(a=="new"){S.slot=+d.i;S.view="teams";render()}
+  else if(a=="pick"){S.career=newCareer(d.id,false);S.view="home";await save();S.slots[S.slot]={team:d.id,year:2026,week:1};render()}
+  else if(a=="load"){S.slot=+d.i;S.career=await dbGet("slot"+d.i);S.view="home";render()}
+  else if(a=="del"){if(confirm("Delete this career? Export it first if you want a backup.")){await dbDel("slot"+d.i);S.slots[+d.i]=null;render()}}
+  else if(a=="exp"){const c=await dbGet("slot"+d.i),u=URL.createObjectURL(new Blob([JSON.stringify(c)],{type:"application/json"})),l=document.createElement("a");l.href=u;l.download="retro-gridiron-slot"+(+d.i+1)+".json";l.click();setTimeout(()=>URL.revokeObjectURL(u),3e3)}
+  else if(a=="imp"){const f=$("#file");f.onchange=async()=>{try{const c=JSON.parse(await f.files[0].text());if(!c.league)throw 0;await dbPut("slot"+d.i,c);S.slots[+d.i]={team:c.team,year:c.year,week:c.week};render();toast("Imported")}catch(x){toast("That file is not a valid save")}};f.click()}
+  else if(a=="tab"){S.tab=d.t;render()}
+  else if(a=="set"){S.set[d.k]=d.v=="true"?true:d.v=="false"?false:isNaN(d.v)?d.v:+d.v;await save();render()}
+  else if(a=="player")player(d.id);
+  else if(a=="close")document.querySelector(".mod").remove();
+});
+loadAll().then(render);render();
+if("serviceWorker"in navigator)addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script></body></html>
